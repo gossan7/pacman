@@ -1,0 +1,10 @@
+graph lib: pyray / better mlx
+input: pynput
+
+config.json
+save.json (score in solo mode, score in coop mode)
+
+polymorphique display with multiple views (menu, game, etc)
+
+main loop qui call les fonctions d'update des views etc:
+    
