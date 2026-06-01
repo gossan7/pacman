@@ -32,6 +32,9 @@ class Map:
         self._corners = {(0, 0), (0, width - 1), (height - 1, 0),
                          (height - 1, width - 1)}
 
+        self._gum_val: int = gum_val
+        self._supergum_val: int = supergum_val
+
         self.map: list[list[Cell]] = [
             [
                 Cell(
@@ -52,5 +55,5 @@ class Map:
             return SuperGum(self._supergum_val)
         return Gum(self._gum_val)
 
-    def _delete_content(self, row: int, col: int) -> None:
+    def delete_content(self, row: int, col: int) -> None:
         self.map[row][col].content = None
