@@ -34,6 +34,8 @@ class Map:
 
         self._gum_val: int = gum_val
         self._supergum_val: int = supergum_val
+        self.height: int = height
+        self.width: int = width
 
         self.map: list[list[Cell]] = [
             [
