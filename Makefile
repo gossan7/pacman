@@ -1,7 +1,7 @@
 RUN := uv run python -B
 PYPROJECT_TOML := pyproject.toml
 
-ARGS ?= index
+ARGS ?= config.json
 FLAKE8 := $(RUN) -m flake8
 MYPY := $(RUN) -m mypy
 
