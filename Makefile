@@ -14,7 +14,7 @@ $(INSTALL_STAMP): $(PYPROJECT_TOML)
 install: $(INSTALL_STAMP)
 
 run: $(INSTALL_STAMP)
-	@$(RUN) -m src $(ARGS)
+	@$(RUN) pac-man.py $(ARGS)
 
 debug: $(INSTALL_STAMP)
 	@$(RUN) -m pdb -m src $(ARGS)

@@ -1,6 +1,6 @@
 from typing import Dict
 from .renderer import Renderer
-from ..engine import Engine
+from ..engines import Engine
 
 
 class ScoreRenderer(Renderer):
