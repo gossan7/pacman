@@ -5,4 +5,4 @@ class Gum:
 
 class SuperGum(Gum):
     def __init__(self, value: int) -> None:
-        super.__init__(value)
+        super().__init__(value)

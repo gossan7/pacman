@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .orchestrator import GlobalState
+from .global_state import GlobalState
 from .engine_flag import EngineFlag
 
 

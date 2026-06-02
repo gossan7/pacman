@@ -3,18 +3,8 @@ from .game_engine import GameEngine
 from .menu_engine import MenuEngine
 from .pause_engine import PauseEngine
 from .engine_flag import EngineFlag
-# add les renderers
-
-
-class GlobalState:
-    def __init__(self, delta_time: float) -> None:
-        self.is_paused: bool = False
-        self.focus: EngineFlag = EngineFlag.MENU
-        self.cheat_enabled: bool = False
-        self.delta_time: float = delta_time
-        self.running: bool = True
-        self.engine_stack: list[list[EngineFlag, bool]] = [
-            [EngineFlag.MENU, True], [EngineFlag.GAME, False], [EngineFlag.PAUSE, False]]
+from ..renderers import MenuRenderer, GameRenderer, PauseRenderer, Renderer
+from .global_state import GlobalState
 
 
 class Orchestrator:
@@ -24,7 +14,11 @@ class Orchestrator:
         self.menu_renderer = MenuRenderer(
             engine=self.menu_engine, config=config)
 
-        self.game_engine = GameEngine(False, False)
+        self.game_engine = GameEngine(
+            config=config,
+            is_running=False,
+            is_listening=False,
+            seed=config['seed'])
         self.game_renderer = GameRenderer(
             engine=self.game_engine, config=config)
 
@@ -38,15 +32,20 @@ class Orchestrator:
         # self.inputs: list[inputtype] = [] => todo
 
     def run(self) -> None:
+        # TEMPORARY : artificial loop to break at some point
+        i = 0 # TEMPORARY
         while self.global_state.running:
             self.handle_inputs()
             for flag, present in self.global_state.engine_stack:
                 if present:
                     engine, renderer = self.get_from_stack(flag)
                     engine.update(self.global_state)
-                    renderer.render(self.global_state)
-            # self.update_engine_stack() => plus besoin on le fais dans
-            # l'update de l'engine
+                    renderer.render()
+            i += 1 # TEMPORARY
+            print(i) # TEMPORARY
+            if i >= 100: # TEMPORARY
+                self.global_state.running = False # TEMPORARY
+
             self.clear_input()
 
     def get_from_stack(self, flag: EngineFlag) -> tuple[Engine, Renderer]:
@@ -62,6 +61,7 @@ class Orchestrator:
         # on garde la derniere direction input, on skip les autres
         # on garde une info d'input sur echap et on skip les autres
         # stocker dans self.inputs
+        pass
 
     def clear_input(self) -> None:
         self.inputs = []

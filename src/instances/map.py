@@ -12,6 +12,10 @@ class Cell:
 
 
 class Map:
+    # Size of the 42 pattern in the middle
+    _PATTERN_ROWS = 5
+    _PATTERN_COLS = 7
+
     def __init__(
             self,
             gum_val: int = 10,
@@ -36,8 +40,12 @@ class Map:
         self._supergum_val: int = supergum_val
         self.height: int = height
         self.width: int = width
+        self.middle: tuple[int, int] = (
+            (self.height - self._PATTERN_ROWS) // 2 + self._PATTERN_ROWS // 2,
+            (self.width - self._PATTERN_COLS) // 2 + self._PATTERN_COLS // 2,
+        )
 
-        self.map: list[list[Cell]] = [
+        self.game_map: list[list[Cell]] = [
             [
                 Cell(
                     self._mazegen.maze[row][col],
@@ -51,7 +59,7 @@ class Map:
 
     def _make_content(self, walls: int, row: int,
                       col: int) -> Gum | SuperGum | None:
-        if walls == 0b1111:                      # case murée (le "42") : rien
+        if walls == 0b1111:
             return None
         if (row, col) in self._corners:
             return SuperGum(self._supergum_val)
