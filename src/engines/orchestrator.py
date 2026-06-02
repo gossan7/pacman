@@ -10,19 +10,15 @@ from .global_state import GlobalState
 class Orchestrator:
 
     def __init__(self, config: dict, delta_time: float) -> None:
-        self.menu_engine = MenuEngine(True, True)
+        self.menu_engine = MenuEngine()
         self.menu_renderer = MenuRenderer(
             engine=self.menu_engine, config=config)
 
-        self.game_engine = GameEngine(
-            config=config,
-            is_running=False,
-            is_listening=False,
-            seed=config['seed'])
+        self.game_engine = GameEngine(config=config, seed=config['seed'])
         self.game_renderer = GameRenderer(
             engine=self.game_engine, config=config)
 
-        self.pause_engine = PauseEngine(False, False)
+        self.pause_engine = PauseEngine()
         self.pause_renderer = PauseRenderer(
             engine=self.pause_engine, config=config)
 
@@ -33,7 +29,7 @@ class Orchestrator:
 
     def run(self) -> None:
         # TEMPORARY : artificial loop to break at some point
-        i = 0 # TEMPORARY
+        i = 0  # TEMPORARY
         while self.global_state.running:
             self.handle_inputs()
             for flag, present in self.global_state.engine_stack:
@@ -41,10 +37,10 @@ class Orchestrator:
                     engine, renderer = self.get_from_stack(flag)
                     engine.update(self.global_state)
                     renderer.render()
-            i += 1 # TEMPORARY
-            print(i) # TEMPORARY
-            if i >= 100: # TEMPORARY
-                self.global_state.running = False # TEMPORARY
+            i += 1  # TEMPORARY
+            print(i)  # TEMPORARY
+            if i >= 100:  # TEMPORARY
+                self.global_state.running = False  # TEMPORARY
 
             self.clear_input()
 

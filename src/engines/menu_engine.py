@@ -4,9 +4,8 @@ from .engine_flag import EngineFlag
 
 
 class MenuEngine(Engine):
-    def __init__(self, is_running: bool = True,
-                 is_listening: bool = True) -> None:
-        super().__init__(is_running, is_listening)
+    def __init__(self) -> None:
+        super().__init__()
         self.flag = EngineFlag.MENU
 
     def update_always(self, globalstate: GlobalState) -> None:

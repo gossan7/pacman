@@ -4,10 +4,7 @@ from .engine_flag import EngineFlag
 
 
 class Engine(ABC):
-    def __init__(self, is_running: bool = True,
-                 is_listening: bool = True) -> None:
-        self.is_running: bool = is_running
-        self.is_listening: bool = is_listening
+    def __init__(self) -> None:
         self.flag = EngineFlag.NONE
 
     @abstractmethod

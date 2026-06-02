@@ -8,10 +8,8 @@ class GameEngine(Engine):
     def __init__(
             self,
             config: dict,
-            is_running: bool = True,
-            is_listening: bool = True,
             seed: int = 0) -> None:
-        super().__init__(is_running, is_listening)
+        super().__init__()
         self.flag = EngineFlag.GAME
         self.map: Map = Map(
             gum_val=config['gum_val'],
