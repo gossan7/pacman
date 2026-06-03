@@ -1,10 +1,11 @@
-from typing import Dict, Any
+from typing import Any
 from .core import Orchestrator
 
 
-def load_config(filename: str = "config.json") -> Dict:
+def load_config(filename: str = "config.json") -> dict:
     """hardcoded values to test, need to do a real parser after"""
     res: dict[str, Any] = {
+        "fps": 30,
         "seed": 42,
         "width": 20,
         "height": 20,
@@ -19,8 +20,8 @@ def load_config(filename: str = "config.json") -> Dict:
 
 
 def main() -> None:
-    config: Dict = load_config()
+    config: dict = load_config()
 
-    orchestrator = Orchestrator(config, 1.0)
+    orchestrator = Orchestrator(config)
     orchestrator.run()
     # orchestrator.run_test()

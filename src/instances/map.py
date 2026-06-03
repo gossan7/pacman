@@ -6,7 +6,8 @@ class Cell:
     def __init__(
             self,
             walls: int,
-            content: Gum | SuperGum | None) -> None:
+            content: Gum | SuperGum | None
+    ) -> None:
         self.walls: int = walls
         self.content = content
 
@@ -22,7 +23,8 @@ class Map:
             supergum_val: int = 50,
             width: int = 20,
             height: int = 20,
-            seed: int = 0) -> None:
+            seed: int = 0
+    ) -> None:
         """Inits a maze then use it as a map
         Each cell has walls encoded on 4 bits so we can do
         bitwise operations with directions. Also inits supergums on the corners
@@ -66,4 +68,4 @@ class Map:
         return Gum(self._gum_val)
 
     def delete_content(self, row: int, col: int) -> None:
-        self.map[row][col].content = None
+        self.game_map[row][col].content = None
