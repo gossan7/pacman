@@ -1,11 +1,10 @@
-from typing import Dict
 from .renderer import Renderer
 from ..engines import Engine
 
 
 class GameRenderer(Renderer):
-    def __init__(self, engine: Engine, config: Dict) -> None:
-        super().__init__(engine, config)
+    def __init__(self, config: dict, engine: Engine) -> None:
+        super().__init__(config, engine)
 
     def render(self):
         pass

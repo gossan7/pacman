@@ -1,15 +1,12 @@
-from typing import Dict
 from abc import ABC, abstractmethod
+
 from ..engines import Engine
 
 
 class Renderer(ABC):
-    def __init__(self, engine: Engine, config: Dict) -> None:
-        self.engine = engine
+    def __init__(self, config: dict, engine: Engine) -> None:
         self.config = config
-
-    def switch_full_screen(self) -> None:
-        pass
+        self.engine = engine
 
     @abstractmethod
     def render(self) -> None:

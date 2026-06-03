@@ -4,12 +4,12 @@ from ..state import EngineFlag
 
 
 class MenuEngine(Engine):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: dict) -> None:
+        super().__init__(config)
         self.flag = EngineFlag.MENU
 
-    def update_always(self, globalstate: GlobalState, controls: dict) -> None:
+    def update_always(self, globalstate: GlobalState) -> None:
         pass
 
-    def update_focus(self, globalstate: GlobalState, controls: dict) -> None:
+    def update_focus(self, globalstate: GlobalState) -> None:
         pass

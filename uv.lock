@@ -24,6 +24,7 @@ dependencies = [
     { name = "mazegenerator" },
     { name = "pynput" },
     { name = "pyray" },
+    { name = "types-pynput" },
 ]
 
 [package.metadata]
@@ -31,6 +32,7 @@ requires-dist = [
     { name = "mazegenerator", path = "packages/mazegenerator-2.0.2-py3-none-any.whl" },
     { name = "pynput", specifier = ">=1.8.2" },
     { name = "pyray", specifier = ">=0.1.0" },
+    { name = "types-pynput", specifier = ">=1.8.1.20260603" },
 ]
 
 [[package]]
@@ -177,4 +179,13 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "types-pynput"
+version = "1.8.1.20260603"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/fb/71a9c1ad440a7f1c6c2bd3a8ffb889f6983a4a5b1f782804c3015b60fac6/types_pynput-1.8.1.20260603.tar.gz", hash = "sha256:c22690e389ce6ae5ca19ae496176d5ebac507aa742bfcdf34cb530c8c1ba9450", size = 12215, upload-time = "2026-06-03T06:42:02.578Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/50/5a7b71dd98fdecc0133133c72581acf637faaafc1e244ae6d39a8d7592fe/types_pynput-1.8.1.20260603-py3-none-any.whl", hash = "sha256:59a73c1c9d51f74a20aa57d26278e4db1e8501c609177182beca378eab016802", size = 12302, upload-time = "2026-06-03T06:42:01.545Z" },
 ]

@@ -8,6 +8,7 @@ dependencies = [
     "mazegenerator",
     "pynput>=1.8.2",
     "pyray>=0.1.0",
+    "types-pynput>=1.8.1.20260603",
 ]
 
 [tool.uv.sources]
