@@ -40,15 +40,31 @@ class Orchestrator:
             for flag, present in self.global_state.engine_stack:
                 if present:
                     engine, renderer = self.get_from_stack(flag)
-                    engine.update(self.global_state, controls)
-                    print(controls)
-                    renderer.render() # to add: catch the switch fullscreen/window (add in the render or in another method)
+                    engine.update(self.global_state, controls)# to add: catch the switch fullscreen/window (add in the renderer or in another method)
+                    renderer.render()
             i += 1  # TEMPORARY
             print(i)  # TEMPORARY
             if i >= 10:  # TEMPORARY
                 self.global_state.running = False  # TEMPORARY
 
             self.input_controller.clear_input()
+
+        self.input_controller.stop()
+
+    def run_test(self, max_iterations: int = 10) -> None:
+        """TO DELETE: to test the inputs if needed"""
+        import time
+        i = 0
+
+        self.input_controller.start()
+
+        while self.global_state.running and i < max_iterations:
+            while not any(self.input_controller.formatted_inputs.values()):
+                time.sleep(0.05)
+
+            print(dict(self.input_controller.formatted_inputs))
+            self.input_controller.clear_input()
+            i += 1
 
         self.input_controller.stop()
 

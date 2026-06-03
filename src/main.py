@@ -23,3 +23,4 @@ def main() -> None:
 
     orchestrator = Orchestrator(config, 1.0)
     orchestrator.run()
+    # orchestrator.run_test()

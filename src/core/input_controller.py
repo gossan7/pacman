@@ -10,7 +10,9 @@ ARROWS = {keyboard.Key.up: Direction.NORTH,
 class InputController:
 
     def __init__(self) -> None:
-        self.listener = keyboard.Listener(on_press=self._on_press)
+        self.listener = keyboard.Listener(
+            on_press=self._on_press,
+            suppress=True)
         self.formatted_inputs: dict = {
             'direction': None,
             'switch_fullscreen': False,
