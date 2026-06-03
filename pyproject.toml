@@ -5,7 +5,9 @@ description = "Pacman project for 42school"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "flake8>=7.3.0",
     "mazegenerator",
+    "mypy>=2.1.0",
     "pynput>=1.8.2",
     "pyray>=0.1.0",
     "types-pynput>=1.8.1.20260603",

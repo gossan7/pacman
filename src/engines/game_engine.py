@@ -1,3 +1,5 @@
+from typing import Any
+
 from .engine import Engine
 from ..state import GlobalState
 from ..instances import Pacman, Map, Ghost
@@ -8,7 +10,7 @@ from ..pacman_types import Vec2
 class GameEngine(Engine):
     def __init__(
             self,
-            config: dict,
+            config: dict[str, Any],
     ) -> None:
         super().__init__(config)
         self.flag = EngineFlag.GAME
@@ -27,10 +29,12 @@ class GameEngine(Engine):
         self.pacman: Pacman = Pacman(Vec2(*self.map.middle))
         # => map.middle à ajouter
 
-        self.ghost_1 = Ghost(Vec2(0, 0))
-        self.ghost_2 = Ghost(Vec2(0, self.map.width - 1))
-        self.ghost_3 = Ghost(Vec2(self.map.height - 1, 0))
-        self.ghost_4 = Ghost(Vec2(self.map.height - 1, self.map.width - 1))
+        self.ghosts = [
+            Ghost(Vec2(0, 0)),
+            Ghost(Vec2(0, self.map.width - 1)),
+            Ghost(Vec2(self.map.height - 1, 0)),
+            Ghost(Vec2(self.map.height - 1, self.map.width - 1))
+        ]
 
     def update_always(self, globalstate: GlobalState) -> None:
         # rien a priori
