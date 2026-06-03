@@ -1,7 +1,7 @@
 from .engine import Engine
-from .global_state import GlobalState
+from ..state import GlobalState
 from ..instances import Pacman, Map, Ghost
-from .engine_flag import EngineFlag
+from ..state import EngineFlag
 
 
 class GameEngine(Engine):
@@ -30,11 +30,11 @@ class GameEngine(Engine):
         self.ghost_4: list[Ghost, tuple[int, int]] = [
             Ghost(), [self.map.height - 1, self.map.width - 1]]
 
-    def update_always(self, globalstate: GlobalState) -> None:
+    def update_always(self, globalstate: GlobalState, controls: dict) -> None:
         # rien a priori
         pass
 
-    def update_focus(self, globalstate: GlobalState) -> None:
+    def update_focus(self, globalstate: GlobalState, controls: dict) -> None:
         # avancer les entités vers leur directions
         # modifier la direction
         # check les colisions => peut etre dans le update always ?
