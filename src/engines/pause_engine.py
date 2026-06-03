@@ -1,6 +1,6 @@
 from .engine import Engine
-from .global_state import GlobalState
-from .engine_flag import EngineFlag
+from ..state import GlobalState
+from ..state import EngineFlag
 
 
 class PauseEngine(Engine):
@@ -8,8 +8,8 @@ class PauseEngine(Engine):
         super().__init__()
         self.flag = EngineFlag.PAUSE
 
-    def update_always(self, globalstate: GlobalState) -> None:
+    def update_always(self, globalstate: GlobalState, controls: dict) -> None:
         pass
 
-    def update_focus(self, globalstate: GlobalState) -> None:
+    def update_focus(self, globalstate: GlobalState, controls: dict) -> None:
         pass
