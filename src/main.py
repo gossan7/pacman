@@ -14,14 +14,18 @@ def load_config(filename: str = "config.json") -> dict:
         "supergum_val": 50,
         "ghost_val": 200,
         "level_max_time": 90,
-        "highscore_filename": "highscores.json",
+        "highscore_filename": "highSCORE.json",
     }
     return res
 
 
 def main() -> None:
-    config: dict = load_config()
+    config: dict[str, Any] = load_config()
 
     orchestrator = Orchestrator(config)
     orchestrator.run()
     # orchestrator.run_test()
+
+
+if __name__ == "__main__":
+    main()

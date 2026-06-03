@@ -1,3 +1,4 @@
+from typing import Any
 from abc import ABC, abstractmethod
 
 from ..state import GlobalState
@@ -5,7 +6,7 @@ from ..state import EngineFlag
 
 
 class Engine(ABC):
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: dict[str, Any]) -> None:
         self.flag = EngineFlag.NONE
         self.config = config
 

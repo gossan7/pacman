@@ -47,7 +47,17 @@ class Orchestrator:
         self.frame_start = perf_counter()
 
     def update_global_state(self) -> None:
-        self.global_state.inputs = self.input_handler.get_formatted_inputs()
+        self.global_state.events = self.input_handler.get_formatted_inputs()
+
+        for _ in range(min(self.global_state.to_remove,
+                           len(self.global_state.engine_stack))):
+            self.global_state.engine_stack.pop()
+
+        if self.global_state.to_add is not None:
+            self.global_state.engine_stack.append(self.global_state.to_add)
+
+        if len(self.global_state.engine_stack) == 0:
+            self.global_state.running = False
 
         now = perf_counter()
         self.global_state.delta_time = now - self.frame_start
@@ -59,11 +69,10 @@ class Orchestrator:
 
     def run(self) -> None:
         # TEMPORARY : artificial loop to break at some point
-        i = 0  # TEMPORARY
+        # i = 0  # TEMPORARY
 
         self.input_handler.start()
         while self.global_state.running:
-            self.update_global_state()
             for flag in self.global_state.engine_stack:
                 engine, renderer = self.engines[flag]
                 # to add: catch the switch fullscreen/window (add in the
@@ -71,10 +80,11 @@ class Orchestrator:
                 engine.update(self.global_state)
                 renderer.render()
             self.wait_frame_time()
-            i += 1  # TEMPORARY
-            print(i)  # TEMPORARY
-            if i >= 10:  # TEMPORARY
-                self.global_state.running = False  # TEMPORARY
+            self.update_global_state()
+            # i += 1  # TEMPORARY
+            # print(i)  # TEMPORARY
+            # if i >= 10:  # TEMPORARY
+            # self.global_state.running = False  # TEMPORARY
 
         self.input_handler.stop()
 
