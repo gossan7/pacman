@@ -1,8 +1,10 @@
 from typing import Any
+import pyray
+
 from .core import Orchestrator
 
 
-def load_config(filename: str = "config.json") -> dict:
+def load_config(filename: str = "config.json") -> dict[str, Any]:
     """hardcoded values to test, need to do a real parser after"""
     res: dict[str, Any] = {
         "fps": 30,
@@ -19,9 +21,20 @@ def load_config(filename: str = "config.json") -> dict:
     return res
 
 
+def init_window():
+    pyray.init_window(1920, 1080, "Pacman")
+
+    width = pyray.get_monitor_width(0) // 2
+    height = pyray.get_monitor_height(0) // 2
+
+    print(width, height)
+
+    pyray.set_window_size(width, height)
+
+
 def main() -> None:
     config: dict[str, Any] = load_config()
-
+    init_window()
     orchestrator = Orchestrator(config)
     orchestrator.run()
     # orchestrator.run_test()

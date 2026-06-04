@@ -1,5 +1,6 @@
 from typing import Type, Any
 from time import perf_counter, sleep
+import pyray
 
 from ..engines import (
     Engine,
@@ -52,11 +53,16 @@ class Orchestrator:
         for _ in range(min(self.global_state.to_remove,
                            len(self.global_state.engine_stack))):
             self.global_state.engine_stack.pop()
+        self.global_state.to_remove = 0
 
         if self.global_state.to_add is not None:
             self.global_state.engine_stack.append(self.global_state.to_add)
+        self.global_state.to_add = None
 
         if len(self.global_state.engine_stack) == 0:
+            self.global_state.running = False
+
+        if pyray.window_should_close():
             self.global_state.running = False
 
         now = perf_counter()
@@ -67,18 +73,27 @@ class Orchestrator:
         elapsed = perf_counter() - self.frame_start
         sleep(max(0, self.frame_time - elapsed))
 
+    def loop_start(self):
+        pyray.begin_drawing()
+        pyray.clear_background(pyray.BLACK)
+
+    def loop_end(self):
+        pyray.end_drawing()
+
     def run(self) -> None:
         # TEMPORARY : artificial loop to break at some point
         # i = 0  # TEMPORARY
 
         self.input_handler.start()
         while self.global_state.running:
+            self.loop_start()
             for flag in self.global_state.engine_stack:
                 engine, renderer = self.engines[flag]
                 # to add: catch the switch fullscreen/window (add in the
                 # renderer or in another method)
                 engine.update(self.global_state)
                 renderer.render()
+            self.loop_end()
             self.wait_frame_time()
             self.update_global_state()
             # i += 1  # TEMPORARY

@@ -65,7 +65,7 @@ class InputHandler:
         self.formatted_inputs["escape"] = False
         self.formatted_inputs["fullscreen"] = False
 
-    def get_formatted_inputs(self) -> dict:
+    def get_formatted_inputs(self) -> list[EventsEnum]:
         to_return = []
         with self._lock:
             if self.formatted_inputs["direction"]:

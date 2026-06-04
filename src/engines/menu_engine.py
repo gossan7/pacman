@@ -6,21 +6,28 @@ from ..state import GlobalState, EngineFlag, EventsEnum
 
 
 class RegionEnum(Enum):
-    START = 0,
+    PLAY = 0,
     SCORE = 1
     OPTIONS = 2,
     QUIT = 3
 
 
 REGIONS = [
-    RegionEnum.START,
+    RegionEnum.PLAY,
     RegionEnum.SCORE,
     RegionEnum.OPTIONS,
     RegionEnum.QUIT
 ]
 
+REGIONS_STR = {
+    RegionEnum.PLAY: "PLAY",
+    RegionEnum.SCORE: "SCORES",
+    RegionEnum.OPTIONS: "OPTIONS",
+    RegionEnum.QUIT: "QUIT"
+}
+
 ACTIONS = {
-    RegionEnum.START: (EngineFlag.GAME, True),
+    RegionEnum.PLAY: (EngineFlag.GAME, True),
     RegionEnum.SCORE: (EngineFlag.SCORE, False),
     RegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
     RegionEnum.QUIT: (EngineFlag.QUIT, False)
@@ -47,13 +54,9 @@ class MenuEngine(Engine):
             match event:
                 case EventsEnum.UP:
                     self.hover_on = max(self.hover_on - 1, 0)
-                    print("feur 1")
                 case EventsEnum.DOWN:
                     self.hover_on = min(self.hover_on + 1, len(REGIONS) - 1)
-                    print("feur 2")
                 case EventsEnum.ENTER:
                     self.activate_current_hover(globalstate)
-                    print("feur 3")
                 case EventsEnum.ESCAPE:
                     globalstate.to_add = EngineFlag.QUIT
-                    print("feur 4")

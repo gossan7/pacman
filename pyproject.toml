@@ -9,7 +9,7 @@ dependencies = [
     "mazegenerator",
     "mypy>=2.1.0",
     "pynput>=1.8.2",
-    "pyray>=0.1.0",
+    "raylib>=5.5.0.4",
     "types-pynput>=1.8.1.20260603",
 ]
 
