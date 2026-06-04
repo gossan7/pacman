@@ -7,6 +7,6 @@ class Ghost(Entity):
     def __init__(
             self,
             position: Vec2,
-            direction: Direction = Direction.NORTH
+            direction: Direction = Direction.NONE
     ) -> None:
         super().__init__(position, direction)

@@ -1,5 +1,14 @@
 from mazegenerator import MazeGenerator
 from .gum import Gum, SuperGum
+from ..pacman_types import Vec2
+from .direction import Direction
+
+_DELTA: dict[Direction, Vec2] = {
+    Direction.NORTH: Vec2(-1, 0),
+    Direction.SOUTH: Vec2(1, 0),
+    Direction.WEST: Vec2(0, -1),
+    Direction.EAST: Vec2(0, 1),
+}
 
 
 class Cell:
@@ -69,3 +78,11 @@ class Map:
 
     def delete_content(self, row: int, col: int) -> None:
         self.game_map[row][col].content = None
+
+    def can_move(self, position: Vec2, direction: Direction) -> bool:
+        cell = self.game_map[position.row][position.col]
+        return (cell.walls & direction) == 0
+
+    def destination(self, position: Vec2, direction: Direction) -> Vec2:
+        delta = _DELTA[direction]
+        return Vec2(position.row + delta.row, position.col + delta.col)
