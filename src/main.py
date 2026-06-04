@@ -23,12 +23,8 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
 
 def init_window():
     pyray.init_window(1920, 1080, "Pacman")
-
-    width = pyray.get_monitor_width(0) // 2
-    height = pyray.get_monitor_height(0) // 2
-
-    print(width, height)
-
+    width = int(pyray.get_monitor_width(0) / 1.5)
+    height = int(pyray.get_monitor_height(0) / 1.5)
     pyray.set_window_size(width, height)
 
 

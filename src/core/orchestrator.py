@@ -12,14 +12,14 @@ from ..engines import (
 )
 from ..renderers import (
     Renderer,
+    WindowHandler,
     MenuRenderer,
     GameRenderer,
     PauseRenderer,
     CheatRenderer,
     ScoreRenderer
 )
-from ..state import EngineFlag
-from ..state import GlobalState
+from ..state import EngineFlag, GlobalState
 from .input_handler import InputHandler
 
 
@@ -35,10 +35,11 @@ ENGINES: list[tuple[EngineFlag, Type[Engine], Type[Renderer]]] = [
 class Orchestrator:
 
     def __init__(self, config: dict[str, Any]) -> None:
+        self.window_handler = WindowHandler()
         self.engines: dict[EngineFlag, tuple[Engine, Renderer]] = {}
         for engine_flag, engine_class, renderer_class in ENGINES:
             engine = engine_class(config)
-            renderer = renderer_class(config, engine)
+            renderer = renderer_class(config, engine, self.window_handler)
             self.engines[engine_flag] = (engine, renderer)
 
         self.config = config
@@ -86,6 +87,7 @@ class Orchestrator:
 
         self.input_handler.start()
         while self.global_state.running:
+            self.window_handler.update(self.global_state)
             self.loop_start()
             for flag in self.global_state.engine_stack:
                 engine, renderer = self.engines[flag]

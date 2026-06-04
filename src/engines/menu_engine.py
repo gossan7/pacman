@@ -5,7 +5,7 @@ from .engine import Engine
 from ..state import GlobalState, EngineFlag, EventsEnum
 
 
-class RegionEnum(Enum):
+class MenuRegionEnum(Enum):
     PLAY = 0,
     SCORE = 1
     OPTIONS = 2,
@@ -13,24 +13,24 @@ class RegionEnum(Enum):
 
 
 REGIONS = [
-    RegionEnum.PLAY,
-    RegionEnum.SCORE,
-    RegionEnum.OPTIONS,
-    RegionEnum.QUIT
+    MenuRegionEnum.PLAY,
+    MenuRegionEnum.SCORE,
+    MenuRegionEnum.OPTIONS,
+    MenuRegionEnum.QUIT
 ]
 
 REGIONS_STR = {
-    RegionEnum.PLAY: "PLAY",
-    RegionEnum.SCORE: "SCORES",
-    RegionEnum.OPTIONS: "OPTIONS",
-    RegionEnum.QUIT: "QUIT"
+    MenuRegionEnum.PLAY: "PLAY",
+    MenuRegionEnum.SCORE: "SCORES",
+    MenuRegionEnum.OPTIONS: "OPTIONS",
+    MenuRegionEnum.QUIT: "QUIT"
 }
 
 ACTIONS = {
-    RegionEnum.PLAY: (EngineFlag.GAME, True),
-    RegionEnum.SCORE: (EngineFlag.SCORE, False),
-    RegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
-    RegionEnum.QUIT: (EngineFlag.QUIT, False)
+    MenuRegionEnum.PLAY: (EngineFlag.GAME, True),
+    MenuRegionEnum.SCORE: (EngineFlag.SCORE, False),
+    MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
+    MenuRegionEnum.QUIT: (EngineFlag.QUIT, False)
 }
 
 
