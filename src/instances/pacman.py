@@ -10,6 +10,3 @@ class Pacman(Entity):
             direction: Direction = Direction.NORTH
     ) -> None:
         super().__init__(position, direction)
-
-    def update_direction(self, possible_directions: list[Direction]) -> None:
-        pass
