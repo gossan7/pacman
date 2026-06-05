@@ -6,29 +6,33 @@ from ..state import GlobalState, EngineFlag, EventsEnum
 
 
 class MenuRegionEnum(Enum):
-    PLAY = 0,
-    SCORE = 1
-    OPTIONS = 2,
-    QUIT = 3
+    PLAY = 0
+    SCORES = 1
+    CONTROLS = 2
+    OPTIONS = 3
+    QUIT = 4
 
 
 REGIONS = [
     MenuRegionEnum.PLAY,
-    MenuRegionEnum.SCORE,
+    MenuRegionEnum.SCORES,
+    MenuRegionEnum.CONTROLS,
     MenuRegionEnum.OPTIONS,
     MenuRegionEnum.QUIT
 ]
 
 REGIONS_STR = {
     MenuRegionEnum.PLAY: "PLAY",
-    MenuRegionEnum.SCORE: "SCORES",
+    MenuRegionEnum.SCORES: "SCORES",
+    MenuRegionEnum.CONTROLS: "CONTROLS",
     MenuRegionEnum.OPTIONS: "OPTIONS",
     MenuRegionEnum.QUIT: "QUIT"
 }
 
 ACTIONS = {
     MenuRegionEnum.PLAY: (EngineFlag.GAME, True),
-    MenuRegionEnum.SCORE: (EngineFlag.SCORE, False),
+    MenuRegionEnum.SCORES: (EngineFlag.SCORES, False),
+    MenuRegionEnum.CONTROLS: (EngineFlag.CONTROLS, False),
     MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
     MenuRegionEnum.QUIT: (EngineFlag.QUIT, False)
 }

@@ -5,10 +5,10 @@ from ..state import GlobalState
 from ..state import EngineFlag
 
 
-class ScoreEngine(Engine):
+class ScoresEngine(Engine):
     def __init__(self, config: dict[str, Any]) -> None:
         super().__init__(config)
-        self.flag = EngineFlag.SCORE
+        self.flag = EngineFlag.SCORES
 
     def update_always(self, globalstate: GlobalState) -> None:
         pass

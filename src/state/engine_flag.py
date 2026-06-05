@@ -5,9 +5,10 @@ class EngineFlag(IntFlag):
     NONE = 0
     MENU = 1
     GAME = 2
-    SCORE = 3
-    OPTIONS = 4
-    QUIT = 5
-    PAUSE = 6
-    CHEAT = 7
-    SCORE_REGISTER = 8
+    SCORES = 3
+    CONTROLS = 4
+    OPTIONS = 5
+    QUIT = 6
+    PAUSE = 7
+    CHEAT = 8
+    SCORE_REGISTER = 9

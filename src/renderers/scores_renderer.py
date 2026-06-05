@@ -5,7 +5,7 @@ from ..engines import Engine
 from .window_handler import WindowHandler
 
 
-class ScoreRenderer(Renderer):
+class ScoresRenderer(Renderer):
     def __init__(
         self,
         config: dict[str, Any],
