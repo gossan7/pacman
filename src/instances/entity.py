@@ -1,15 +1,21 @@
 from abc import ABC, abstractmethod
-from .direction import Direction
 import random
+
+from ..pacman_types import Vec2
+from .direction import Direction
 
 
 class Entity(ABC):
-
-    def __init__(self, direction: Direction = Direction.NONE) -> None:
+    def __init__(
+            self,
+            position: Vec2,
+            direction: Direction = Direction.NONE
+    ) -> None:
         """Encode directions on 4 bits
         like 1: top | 2: east | 4 : bottom | 8 : west to mimic
         the mazegenerator and do bitwise operations"""
         self.direction: Direction = direction
+        self.position: Vec2 = position
 
     @staticmethod
     def is_valid_direction(value: int) -> bool:
@@ -18,7 +24,8 @@ class Entity(ABC):
 
     def _choose_random(
             self,
-            possible_directions: list[Direction]) -> Direction:
+            possible_directions: list[Direction]
+    ) -> Direction:
         """Placeholder-like to generate a random walk,
         the list of directions is supposed to be a list of valid directions
         (need a map and a position to do so) given by the GameEngine
@@ -26,7 +33,7 @@ class Entity(ABC):
         return random.choice(possible_directions)
 
     @abstractmethod
-    def update_direction(self) -> None:
+    def update_direction(self, possible_directions: list[Direction]) -> None:
         """For pacman : changes the direction based on inputs
         For ghosts : passing a map then updating according to behaviour"""
         pass

@@ -1,78 +1,122 @@
-from ..engines import Engine
-from ..engines import GameEngine
-from ..engines import MenuEngine
-from ..engines import PauseEngine
-from ..state import EngineFlag
-from ..renderers import MenuRenderer, GameRenderer, PauseRenderer, Renderer
-from ..state import GlobalState
-from .input_controller import InputController
+from typing import Type, Any
+from time import perf_counter, sleep
+import pyray
+
+from ..engines import (
+    Engine,
+    MenuEngine,
+    GameEngine,
+    PauseEngine,
+    CheatEngine,
+    ScoreEngine
+)
+from ..renderers import (
+    Renderer,
+    WindowHandler,
+    MenuRenderer,
+    GameRenderer,
+    PauseRenderer,
+    CheatRenderer,
+    ScoreRenderer
+)
+from ..state import EngineFlag, GlobalState
+from .input_handler import InputHandler
+
+
+ENGINES: list[tuple[EngineFlag, Type[Engine], Type[Renderer]]] = [
+    (EngineFlag.MENU, MenuEngine, MenuRenderer),
+    (EngineFlag.GAME, GameEngine, GameRenderer),
+    (EngineFlag.PAUSE, PauseEngine, PauseRenderer),
+    (EngineFlag.CHEAT, CheatEngine, CheatRenderer),
+    (EngineFlag.SCORE, ScoreEngine, ScoreRenderer)
+]
 
 
 class Orchestrator:
 
-    def __init__(self, config: dict, delta_time: float) -> None:
-        self.menu_engine = MenuEngine()
-        self.menu_renderer = MenuRenderer(
-            engine=self.menu_engine, config=config)
+    def __init__(self, config: dict[str, Any]) -> None:
+        self.window_handler = WindowHandler()
+        self.engines: dict[EngineFlag, tuple[Engine, Renderer]] = {}
+        for engine_flag, engine_class, renderer_class in ENGINES:
+            engine = engine_class(config)
+            renderer = renderer_class(config, engine, self.window_handler)
+            self.engines[engine_flag] = (engine, renderer)
 
-        self.game_engine = GameEngine(config=config, seed=config['seed'])
-        self.game_renderer = GameRenderer(
-            engine=self.game_engine, config=config)
+        self.config = config
+        self.global_state = GlobalState()
+        self.input_handler = InputHandler()
+        self.frame_time = 1.0 / config["fps"]
+        self.frame_start = perf_counter()
 
-        self.pause_engine = PauseEngine()
-        self.pause_renderer = PauseRenderer(
-            engine=self.pause_engine, config=config)
+    def update_global_state(self) -> None:
+        self.global_state.events = self.input_handler.get_formatted_inputs()
 
-        self.config: dict = config
-        self.init_seed = config['seed']
-        self.global_state: GlobalState = GlobalState(delta_time)
+        for _ in range(min(self.global_state.to_remove,
+                           len(self.global_state.engine_stack))):
+            self.global_state.engine_stack.pop()
+        self.global_state.to_remove = 0
 
-        self.input_controller: InputController = InputController()
+        if self.global_state.to_add is not None:
+            self.global_state.engine_stack.append(self.global_state.to_add)
+        self.global_state.to_add = None
+
+        if len(self.global_state.engine_stack) == 0:
+            self.global_state.running = False
+
+        if pyray.window_should_close():
+            self.global_state.running = False
+
+        now = perf_counter()
+        self.global_state.delta_time = now - self.frame_start
+        self.frame_start = now
+
+    def wait_frame_time(self) -> None:
+        elapsed = perf_counter() - self.frame_start
+        sleep(max(0, self.frame_time - elapsed))
+
+    def loop_start(self):
+        pyray.begin_drawing()
+        pyray.clear_background(pyray.BLACK)
+
+    def loop_end(self):
+        pyray.end_drawing()
 
     def run(self) -> None:
         # TEMPORARY : artificial loop to break at some point
-        i = 0  # TEMPORARY
+        # i = 0  # TEMPORARY
 
-        self.input_controller.start()
-
+        self.input_handler.start()
         while self.global_state.running:
-            controls = dict(self.input_controller.formatted_inputs)
-            for flag, present in self.global_state.engine_stack:
-                if present:
-                    engine, renderer = self.get_from_stack(flag)
-                    engine.update(self.global_state, controls)# to add: catch the switch fullscreen/window (add in the renderer or in another method)
-                    renderer.render()
-            i += 1  # TEMPORARY
-            print(i)  # TEMPORARY
-            if i >= 10:  # TEMPORARY
-                self.global_state.running = False  # TEMPORARY
+            self.window_handler.update(self.global_state)
+            self.loop_start()
+            for flag in self.global_state.engine_stack:
+                engine, renderer = self.engines[flag]
+                # to add: catch the switch fullscreen/window (add in the
+                # renderer or in another method)
+                engine.update(self.global_state)
+                renderer.render()
+            self.loop_end()
+            self.wait_frame_time()
+            self.update_global_state()
+            # i += 1  # TEMPORARY
+            # print(i)  # TEMPORARY
+            # if i >= 10:  # TEMPORARY
+            # self.global_state.running = False  # TEMPORARY
 
-            self.input_controller.clear_input()
-
-        self.input_controller.stop()
+        self.input_handler.stop()
 
     def run_test(self, max_iterations: int = 10) -> None:
         """TO DELETE: to test the inputs if needed"""
         import time
         i = 0
 
-        self.input_controller.start()
+        self.input_handler.start()
 
         while self.global_state.running and i < max_iterations:
-            while not any(self.input_controller.formatted_inputs.values()):
+            while not any(self.input_handler.formatted_inputs.values()):
                 time.sleep(0.05)
 
-            print(dict(self.input_controller.formatted_inputs))
-            self.input_controller.clear_input()
+            print(self.input_handler.get_formatted_inputs())
             i += 1
 
-        self.input_controller.stop()
-
-    def get_from_stack(self, flag: EngineFlag) -> tuple[Engine, Renderer]:
-        if flag == EngineFlag.MENU:
-            return (self.menu_engine, self.menu_renderer)
-        elif flag == EngineFlag.GAME:
-            return (self.game_engine, self.game_renderer)
-        elif flag == EngineFlag.PAUSE:
-            return (self.pause_engine, self.pause_renderer)
-        return (self.menu_engine, self.menu_renderer)
+        self.input_handler.stop()

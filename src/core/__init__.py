@@ -1,4 +1,4 @@
 from .orchestrator import Orchestrator
-from .input_controller import InputController
+from .input_handler import InputHandler
 
-__all__ = ['Orchestrator', 'InputController']
+__all__ = ["Orchestrator", "InputHandler"]

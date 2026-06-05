@@ -1,11 +1,18 @@
-from typing import Dict
+from typing import Any
+
 from .renderer import Renderer
 from ..engines import Engine
+from .window_handler import WindowHandler
 
 
 class PauseRenderer(Renderer):
-    def __init__(self, engine: Engine, config: Dict) -> None:
-        super().__init__(engine, config)
+    def __init__(
+        self,
+        config: dict[str, Any],
+        engine: Engine,
+        window_handler: WindowHandler
+    ) -> None:
+        super().__init__(config, engine, window_handler)
 
-    def render(self):
+    def render(self) -> None:
         pass

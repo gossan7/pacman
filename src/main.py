@@ -1,10 +1,13 @@
-from typing import Dict, Any
+from typing import Any
+import pyray
+
 from .core import Orchestrator
 
 
-def load_config(filename: str = "config.json") -> Dict:
+def load_config(filename: str = "config.json") -> dict[str, Any]:
     """hardcoded values to test, need to do a real parser after"""
     res: dict[str, Any] = {
+        "fps": 30,
         "seed": 42,
         "width": 20,
         "height": 20,
@@ -13,14 +16,25 @@ def load_config(filename: str = "config.json") -> Dict:
         "supergum_val": 50,
         "ghost_val": 200,
         "level_max_time": 90,
-        "highscore_filename": "highscores.json",
+        "highscore_filename": "highSCORE.json",
     }
     return res
 
 
-def main() -> None:
-    config: Dict = load_config()
+def init_window():
+    pyray.init_window(1920, 1080, "Pacman")
+    width = int(pyray.get_monitor_width(0) / 1.5)
+    height = int(pyray.get_monitor_height(0) / 1.5)
+    pyray.set_window_size(width, height)
 
-    orchestrator = Orchestrator(config, 1.0)
+
+def main() -> None:
+    config: dict[str, Any] = load_config()
+    init_window()
+    orchestrator = Orchestrator(config)
     orchestrator.run()
     # orchestrator.run_test()
+
+
+if __name__ == "__main__":
+    main()
