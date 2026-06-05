@@ -41,7 +41,7 @@ class GameEngine(Engine):
         self.game_ended: bool = False
         self.max_levels: int = config["num_levels"]
         self.won: bool = False
-        # --- état de NIVEAU (réinitialisé à chaque niveau) ---
+
         self._load_level(config["seed"])
 
     def _load_level(self, seed: int) -> None:
@@ -152,13 +152,16 @@ class GameEngine(Engine):
             self.map.destination(ghost.position, d), target))
 
     def _frightened_direction(self, ghost: Ghost) -> Direction:
-        opts = [d for d in self.map.open_directions(ghost.position)
-                if d != OPPOSITE[ghost.direction]]
+        target = self.pacman.position
+        opts = [d for d in _PRIORITY
+                if self.map.can_move(ghost.position, d)
+                and d != OPPOSITE[ghost.direction]]
         if not opts:
-            opts = self.map.open_directions(ghost.position)
+            opts = [d for d in _PRIORITY if self.map.can_move(ghost.position, d)]
         if not opts:
             return Direction.NONE
-        return random.choice(opts)
+        return max(opts, key=lambda d: self._dist2(
+            self.map.destination(ghost.position, d), target))
 
     def _enter_frightened(self) -> None:
         self.frightened_remaining = self.frightened_duration
