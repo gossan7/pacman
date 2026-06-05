@@ -14,3 +14,5 @@ class GlobalState:
         self.engine_stack: list[EngineFlag] = [
             EngineFlag.MENU,
         ]
+        self.score: int = 0
+        self.won: bool = False

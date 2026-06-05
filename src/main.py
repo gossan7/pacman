@@ -16,6 +16,7 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
         "supergum_val": 50,
         "ghost_val": 200,
         "level_max_time": 90,
+        "frightened_duration": 7.0,
         "pacman_speed": 0.15,
         "highscore_filename": "highSCORE.json",
     }

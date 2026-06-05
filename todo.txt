@@ -8,3 +8,4 @@ polymorphique display with multiple views (menu, game, etc)
 
 main loop qui call les fonctions d'update des views etc:
     
+exemple de gameplay : https://freepacman.org/
