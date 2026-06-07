@@ -60,6 +60,9 @@ class Orchestrator:
             self.global_state.engine_stack.append(self.global_state.to_add)
         self.global_state.to_add = None
 
+        if self.global_state.engine_stack:
+            self.global_state.focus = self.global_state.engine_stack[-1]
+
         if len(self.global_state.engine_stack) == 0:
             self.global_state.running = False
 

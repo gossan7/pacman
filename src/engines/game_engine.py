@@ -33,6 +33,7 @@ class GameEngine(Engine):
         self.ghost_val: int = config["ghost_val"]
         self.level_max_time: int = config["level_max_time"]
         self.pacman_speed: float = config["pacman_speed"]
+        self.ghost_speed: float = config["ghost_speed"]
         self.frightened_duration: float = config["frightened_duration"]
         self.lives: int = config["lives"]
         self.score: int = 0
@@ -54,6 +55,7 @@ class GameEngine(Engine):
         self.pacman = Pacman(Vec2(*self.map.middle))
         self.requested = Direction.NONE
         self.pacman_progress = 0.0
+        self.ghost_progress = 0.0
         self.ghosts = [
             Ghost(Vec2(0, 0), GhostKind.BLINKY),
             Ghost(Vec2(0, self.map.width - 1), GhostKind.PINKY),
@@ -157,7 +159,8 @@ class GameEngine(Engine):
                 if self.map.can_move(ghost.position, d)
                 and d != OPPOSITE[ghost.direction]]
         if not opts:
-            opts = [d for d in _PRIORITY if self.map.can_move(ghost.position, d)]
+            opts = [
+                d for d in _PRIORITY if self.map.can_move(ghost.position, d)]
         if not opts:
             return Direction.NONE
         return max(opts, key=lambda d: self._dist2(
@@ -219,6 +222,10 @@ class GameEngine(Engine):
         self.pacman.direction = Direction.NONE
         self.requested = Direction.NONE
         self.pacman_progress = 0.0
+        self.pacman_progress = 0.0
+        self.ghost_progress = 0.0
+        for ghost in self.ghosts:
+            self._respawn_ghost(ghost)
         if self.lives <= 0:
             self.game_ended = True
 
@@ -247,12 +254,17 @@ class GameEngine(Engine):
         self._tick_frightened(globalstate.delta_time)
         self._tick_level_timer(globalstate.delta_time)
         self.pacman_progress += self.pacman_speed
-        while self.pacman_progress >= _STEP_COST:
+
+        while self.pacman_progress >= _STEP_COST and not self.game_ended:
             self.pacman_progress -= _STEP_COST
             self._step_pacman()
+            self._check_collisions()
+
+        self.ghost_progress += self.ghost_speed
+        while self.ghost_progress >= _STEP_COST and not self.game_ended:
+            self.ghost_progress -= _STEP_COST
             self._step_ghosts()
             self._check_collisions()
-            if self.game_ended:
-                break
+
         if self.game_ended:
             self._end_game(globalstate)
