@@ -77,10 +77,10 @@ class GameEngine(Engine):
 
 #    PACMAN
 
-    def _step_pacman(self) -> None:
+    def _step_pacman(self) -> bool:
         pos = self.pacman.position
-        if self.requested != Direction.NONE and self.map.can_move(
-                pos, self.requested):
+        if (self.requested != Direction.NONE
+                and self.map.can_move(pos, self.requested)):
             self.pacman.direction = self.requested
             self.requested = Direction.NONE
         if (self.pacman.direction != Direction.NONE
@@ -88,6 +88,8 @@ class GameEngine(Engine):
             self.pacman.position = self.map.destination(
                 pos, self.pacman.direction)
             self._eat(self.pacman.position)
+            return True
+        return False
 
     def _eat(self, position: Vec2) -> None:
         content = self.map.game_map[position.row][position.col].content
@@ -255,10 +257,14 @@ class GameEngine(Engine):
         self._tick_level_timer(globalstate.delta_time)
         self.pacman_progress += self.pacman_speed
 
+        self.pacman_progress += self.pacman_speed
         while self.pacman_progress >= _STEP_COST and not self.game_ended:
-            self.pacman_progress -= _STEP_COST
-            self._step_pacman()
-            self._check_collisions()
+            if self._step_pacman():
+                self.pacman_progress -= _STEP_COST
+                self._check_collisions()
+            else:
+                self.pacman_progress = _STEP_COST
+                break
 
         self.ghost_progress += self.ghost_speed
         while self.ghost_progress >= _STEP_COST and not self.game_ended:

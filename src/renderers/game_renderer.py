@@ -12,7 +12,8 @@ HUD_HEIGHT = 90
 MARGIN = 20
 HUD_FONT = 36
 HUD_SPACING = 60
-STEP_COST = 100   # Note: must be the same as the game engine
+STEP_COST = 100
+# Note: faut laisser le meme step_cost que dans l'engine
 
 WALL_COLOR = pyray.Color(33, 33, 222, 255)
 GUM_COLOR = pyray.Color(255, 220, 180, 255)
