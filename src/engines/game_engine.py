@@ -17,6 +17,8 @@ EVENT_TO_DIRECTION: dict[EventsEnum, Direction] = {
 }
 
 _STEP_COST = 100
+_EAT_AT = 7 * _STEP_COST // 10
+_HIT_AT = 6 * _STEP_COST // 10
 
 OPPOSITE = {Direction.NORTH: Direction.SOUTH, Direction.SOUTH: Direction.NORTH,
             Direction.EAST: Direction.WEST, Direction.WEST: Direction.EAST,
@@ -87,7 +89,6 @@ class GameEngine(Engine):
                 and self.map.can_move(pos, self.pacman.direction)):
             self.pacman.position = self.map.destination(
                 pos, self.pacman.direction)
-            self._eat(self.pacman.position)
             return True
         return False
 
@@ -140,7 +141,7 @@ class GameEngine(Engine):
         if ghost.kind == GhostKind.CLYDE:
             if self._dist2(ghost.position, pac) > 8 * 8:
                 return pac
-        return ghost.scatter_corner
+        return ghost.spawn
 
     def _chase_direction(self, ghost: Ghost) -> Direction:
         target = self._target_tile(ghost)
@@ -157,9 +158,9 @@ class GameEngine(Engine):
 
     def _frightened_direction(self, ghost: Ghost) -> Direction:
         target = self.pacman.position
-        opts = [d for d in _PRIORITY
-                if self.map.can_move(ghost.position, d)
-                and d != OPPOSITE[ghost.direction]]
+        opts = [
+            d for d in _PRIORITY if self.map.can_move(ghost.position, d)
+            and d != OPPOSITE[ghost.direction]]
         if not opts:
             opts = [
                 d for d in _PRIORITY if self.map.can_move(ghost.position, d)]
@@ -224,7 +225,6 @@ class GameEngine(Engine):
         self.pacman.direction = Direction.NONE
         self.requested = Direction.NONE
         self.pacman_progress = 0.0
-        self.pacman_progress = 0.0
         self.ghost_progress = 0.0
         for ghost in self.ghosts:
             self._respawn_ghost(ghost)
@@ -255,22 +255,29 @@ class GameEngine(Engine):
         self._read_input(globalstate)
         self._tick_frightened(globalstate.delta_time)
         self._tick_level_timer(globalstate.delta_time)
-        self.pacman_progress += self.pacman_speed
 
+        # PACMAN
         self.pacman_progress += self.pacman_speed
         while self.pacman_progress >= _STEP_COST and not self.game_ended:
             if self._step_pacman():
                 self.pacman_progress -= _STEP_COST
-                self._check_collisions()
+                # self._check_collisions()
             else:
                 self.pacman_progress = _STEP_COST
                 break
 
+        # GHOSTS
         self.ghost_progress += self.ghost_speed
         while self.ghost_progress >= _STEP_COST and not self.game_ended:
             self.ghost_progress -= _STEP_COST
             self._step_ghosts()
-            self._check_collisions()
 
+        # EVENTS
+        if self.pacman_progress >= _EAT_AT:
+            self._eat(self.pacman.position)
+        if not self.game_ended and (
+                self.ghost_progress >= _HIT_AT
+                or self.pacman_progress >= _HIT_AT):
+            self._check_collisions()
         if self.game_ended:
             self._end_game(globalstate)

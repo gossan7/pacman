@@ -14,5 +14,4 @@ class Ghost(Entity):
         super().__init__(position, direction)
         self.is_edible: bool = False
         self.spawn: Vec2 = Vec2(position.row, position.col)
-        self.scatter_corner: Vec2 = Vec2(position.row, position.col)
         self.kind: GhostKind = ghost_kind

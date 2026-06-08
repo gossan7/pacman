@@ -36,6 +36,8 @@ _EYE_DIR = {
     Direction.NONE: (0, 0),
 }
 
+_FRAMES_ANIMATION = 30
+
 
 class GameRenderer(Renderer):
     def __init__(
@@ -47,6 +49,7 @@ class GameRenderer(Renderer):
         self.config = config
         self.engine: GameEngine = engine
         self.window_handler = window_handler
+        self.frame: int = 0
         self._anim: dict[Any, tuple[tuple[int, int], tuple[int, int]]] = {}
 
     def _smooth(self, key: Any, position: Any, progress: float) -> tuple:
@@ -100,10 +103,18 @@ class GameRenderer(Renderer):
                 if board.content is not None:
                     gum_r = (int(cell * 0.28)
                              if isinstance(board.content, SuperGum)
-                             else max(1, int(cell * 0.10)))
-                    pyray.draw_circle(
-                        to_screen(x + half), to_screen(y + half),
-                        to_screen(gum_r), GUM_COLOR)
+                             else max(1, int(cell * 0.16)))
+                    if isinstance(board.content, SuperGum):
+                        if self.frame > 14:
+                            gum_r = max(1, int(cell * 0.28))
+                            pyray.draw_circle(
+                                to_screen(x + half), to_screen(y + half),
+                                to_screen(gum_r), GUM_COLOR)
+                    else:
+                        gum_r = max(1, int(cell * 0.13))
+                        pyray.draw_circle(
+                            to_screen(x + half), to_screen(y + half),
+                            to_screen(gum_r), GUM_COLOR)
 
         # PACMAN
         pac = self.engine.pacman
@@ -153,3 +164,7 @@ class GameRenderer(Renderer):
         for text in items:
             pyray.draw_text(text, hx, hy, font, pyray.WHITE)
             hx += pyray.measure_text(text, font) + to_screen(HUD_SPACING)
+        if self.frame == _FRAMES_ANIMATION:
+            self.frame = 0
+        else:
+            self.frame += 1
