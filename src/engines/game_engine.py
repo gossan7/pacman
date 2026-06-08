@@ -31,7 +31,6 @@ class GameEngine(Engine):
     def __init__(self, config: dict[str, Any]) -> None:
         super().__init__(config)
         self.flag = EngineFlag.GAME
-        # --- état de PARTIE (conservé entre niveaux) ---
         self.ghost_val: int = config["ghost_val"]
         self.level_max_time: int = config["level_max_time"]
         self.pacman_speed: float = config["pacman_speed"]
