@@ -14,6 +14,7 @@ class Entity(ABC):
         the mazegenerator and do bitwise operations"""
         self.direction: Direction = direction
         self.position: Vec2 = position
+        self.prev: Vec2 = Vec2(position.row, position.col)
 
     @staticmethod
     def is_valid_direction(value: int) -> bool:

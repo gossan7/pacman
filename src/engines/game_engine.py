@@ -36,6 +36,7 @@ class GameEngine(Engine):
         self.pacman_speed: float = config["pacman_speed"]
         self.ghost_speed: float = config["ghost_speed"]
         self.frightened_duration: float = config["frightened_duration"]
+        self.hitbox_radius: int = 0.2
         self.lives: int = config["lives"]
         self.score: int = 0
         self.level: int = 1
@@ -80,6 +81,7 @@ class GameEngine(Engine):
 
     def _step_pacman(self) -> bool:
         pos = self.pacman.position
+        self.pacman.prev = self.pacman.position
         if (self.requested != Direction.NONE
                 and self.map.can_move(pos, self.requested)):
             self.pacman.direction = self.requested
@@ -106,6 +108,7 @@ class GameEngine(Engine):
 
     def _step_ghosts(self) -> None:
         for ghost in self.ghosts:
+            ghost.prev = ghost.position
             direction = self._choose_direction(ghost)
             if direction != Direction.NONE and self.map.can_move(
                     ghost.position, direction):
@@ -207,9 +210,20 @@ class GameEngine(Engine):
             if event in EVENT_TO_DIRECTION:
                 self.requested = EVENT_TO_DIRECTION[event]
 
+    def _interp(
+            self, prev: Vec2, cur: Vec2, frac: float) -> tuple[float, float]:
+        return (prev.row + (cur.row - prev.row) * frac,
+                prev.col + (cur.col - prev.col) * frac)
+
     def _check_collisions(self) -> None:
+        pr, pc = self._interp(
+            self.pacman.prev,
+            self.pacman.position,
+            self.pacman_progress / _STEP_COST)
+        gf = self.ghost_progress / _STEP_COST
         for ghost in self.ghosts:
-            if ghost.position != self.pacman.position:
+            gr, gc = self._interp(ghost.prev, ghost.position, gf)
+            if (pr - gr) ** 2 + (pc - gc) ** 2 >= (2 * self.hitbox_radius)**2:
                 continue
             if ghost.is_edible:
                 self.score += self.ghost_val
@@ -274,9 +288,7 @@ class GameEngine(Engine):
         # EVENTS
         if self.pacman_progress >= _EAT_AT:
             self._eat(self.pacman.position)
-        if not self.game_ended and (
-                self.ghost_progress >= _HIT_AT
-                or self.pacman_progress >= _HIT_AT):
+        if not self.game_ended:
             self._check_collisions()
         if self.game_ended:
             self._end_game(globalstate)
