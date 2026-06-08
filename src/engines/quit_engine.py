@@ -21,7 +21,7 @@ class QuitEngine(RegionPopupEngine):
         self.text_to_display = TEXT_TO_DISPLAY
 
     def activate_current_hover(self, globalstate):
-        to_add, remove = ACTIONS[REGIONS[self.hover_on]]
-        globalstate.to_remove += 1 if remove else 0
+        to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
+        globalstate.to_remove += to_remove
         if to_add:
             globalstate.to_add = to_add

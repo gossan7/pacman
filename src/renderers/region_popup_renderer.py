@@ -34,7 +34,15 @@ class RegionPopupRenderer(PopupRenderer):
         super().render()
         to_screen = self.window_handler.to_screen
 
-        start_y = (WORLD_HEIGHT - POPUP_HEIGHT) // 2
+        n = len(self.engine.regions)
+
+        regions_block_height = n * REGION_HEIGHT + \
+            max(n - 1, 0) * REGION_PADDING
+        content_height = TEXT_SIZE_ABOVE + TEXT_POPUP_GAP \
+            + regions_block_height
+
+        block_top = self.popup_y + (POPUP_HEIGHT - content_height) // 2
+
         font_size_above = to_screen(TEXT_SIZE_ABOVE)
         text_width = pyray.measure_text(
             self.engine.text_to_display, font_size_above
@@ -43,7 +51,7 @@ class RegionPopupRenderer(PopupRenderer):
 
         pyray.draw_text(
             self.engine.text_to_display,
-            text_x, to_screen(start_y + TEXT_POPUP_GAP),
+            text_x, to_screen(block_top),
             font_size_above,
             pyray.YELLOW
         )
@@ -51,10 +59,10 @@ class RegionPopupRenderer(PopupRenderer):
         font_size = to_screen(FONT_SIZE)
         region_width = POPUP_WIDTH - POPUP_PADDING * 2
         region_x = self.popup_x + POPUP_PADDING
+        regions_start_y = block_top + TEXT_SIZE_ABOVE + TEXT_POPUP_GAP
 
         for i, region_text in enumerate(self.engine.regions):
-            y = TEXT_SIZE_ABOVE + TEXT_POPUP_GAP * 2 + self.popup_y + \
-                i * (REGION_HEIGHT + REGION_PADDING)
+            y = regions_start_y + i * (REGION_HEIGHT + REGION_PADDING)
 
             rect_screen_x = to_screen(region_x)
             rect_screen_y = to_screen(y)

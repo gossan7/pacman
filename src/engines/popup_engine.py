@@ -21,10 +21,9 @@ class RegionPopupEngine(Engine):
             event = globalstate.events.pop()
             match event:
                 case EventsEnum.UP:
-                    self.hover_on = max(self.hover_on - 1, 0)
+                    self.hover_on = (self.hover_on - 1) % len(self.regions)
                 case EventsEnum.DOWN:
-                    self.hover_on = min(self.hover_on + 1,
-                                        len(self.regions) - 1)
+                    self.hover_on = (self.hover_on + 1) % len(self.regions)
                 case EventsEnum.ENTER:
                     self.activate_current_hover(globalstate)
                 case EventsEnum.ESCAPE:
