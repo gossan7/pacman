@@ -5,6 +5,8 @@ from .pause_renderer import PauseRenderer
 from .cheat_renderer import CheatRenderer
 from .scores_renderer import ScoresRenderer
 from .window_handler import WindowHandler, WORLD_WIDTH, WORLD_HEIGHT
+from .popup_renderer import PopupRenderer
+from .region_popup_renderer import RegionPopupRenderer
 
 
 __all__ = [
@@ -16,5 +18,6 @@ __all__ = [
     "GameRenderer",
     "PauseRenderer",
     "CheatRenderer",
-    "ScoresRenderer"
+    "ScoresRenderer",
+    "PopupRenderer"
 ]

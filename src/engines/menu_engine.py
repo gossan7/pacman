@@ -30,11 +30,11 @@ REGIONS_STR = {
 }
 
 ACTIONS = {
-    MenuRegionEnum.PLAY: (EngineFlag.GAME, True),
-    MenuRegionEnum.SCORES: (EngineFlag.SCORES, False),
-    MenuRegionEnum.CONTROLS: (EngineFlag.CONTROLS, False),
-    MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
-    MenuRegionEnum.QUIT: (EngineFlag.QUIT, False)
+    MenuRegionEnum.PLAY: (EngineFlag.GAME, 1),
+    MenuRegionEnum.SCORES: (EngineFlag.SCORES, 0),
+    MenuRegionEnum.CONTROLS: (EngineFlag.CONTROLS, 0),
+    MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, 0),
+    MenuRegionEnum.QUIT: (EngineFlag.QUIT, 0)
 }
 
 
@@ -45,9 +45,10 @@ class MenuEngine(Engine):
         self.hover_on = 0
 
     def activate_current_hover(self, globalstate: GlobalState):
-        to_add, remove = ACTIONS[REGIONS[self.hover_on]]
-        globalstate.to_remove += 1 if remove else 0
-        globalstate.to_add = to_add
+        to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
+        globalstate.to_remove += to_remove
+        if to_add:
+            globalstate.to_add = to_add
 
     def update_always(self, globalstate: GlobalState) -> None:
         pass

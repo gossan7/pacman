@@ -5,6 +5,7 @@ from .pause_engine import PauseEngine
 from .cheat_engine import CheatEngine
 from .scores_engine import ScoresEngine
 from .popup_engine import RegionPopupEngine
+from .quit_engine import QuitEngine
 
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "PauseEngine",
     "CheatEngine",
     "ScoresEngine",
-    "RegionPopupEngine"
+    "RegionPopupEngine",
+    "QuitEngine"
 ]
