@@ -1,40 +1,23 @@
 from typing import Any
-from enum import Enum
 
 from .engine import Engine
 from ..state import GlobalState, EngineFlag, EventsEnum
 
 
-class MenuRegionEnum(Enum):
-    PLAY = 0
-    SCORES = 1
-    CONTROLS = 2
-    OPTIONS = 3
-    QUIT = 4
-
-
 REGIONS = [
-    MenuRegionEnum.PLAY,
-    MenuRegionEnum.SCORES,
-    MenuRegionEnum.CONTROLS,
-    MenuRegionEnum.OPTIONS,
-    MenuRegionEnum.QUIT
+    "PLAY",
+    "SCORES",
+    "CONTROLS",
+    "OPTIONS",
+    "QUIT"
 ]
 
-REGIONS_STR = {
-    MenuRegionEnum.PLAY: "PLAY",
-    MenuRegionEnum.SCORES: "SCORES",
-    MenuRegionEnum.CONTROLS: "CONTROLS",
-    MenuRegionEnum.OPTIONS: "OPTIONS",
-    MenuRegionEnum.QUIT: "QUIT"
-}
-
 ACTIONS = {
-    MenuRegionEnum.PLAY: (EngineFlag.GAME, 1),
-    MenuRegionEnum.SCORES: (EngineFlag.SCORES, 0),
-    MenuRegionEnum.CONTROLS: (EngineFlag.CONTROLS, 0),
-    MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, 0),
-    MenuRegionEnum.QUIT: (EngineFlag.QUIT, 0)
+    "PLAY": (EngineFlag.GAME, 1),
+    "SCORES": (EngineFlag.SCORES, 0),
+    "COTROLS": (EngineFlag.CONTROLS, 0),
+    "OPTIONS": (EngineFlag.OPTIONS, 0),
+    "QUIT": (EngineFlag.QUIT, 0)
 }
 
 

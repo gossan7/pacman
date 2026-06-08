@@ -16,3 +16,5 @@ class GlobalState:
         ]
         self.score: int = 0
         self.won: bool = False
+        self.to_quit: int = 1
+        self.popup: int = 0
