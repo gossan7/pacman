@@ -2,7 +2,7 @@ from typing import Any
 
 from .engine import Engine
 from ..state import GlobalState
-from ..instances import Pacman, Map, Ghost
+from ..instances import Pacman, Map, Ghost, Entity
 from ..state import EngineFlag, GhostKind
 from ..pacman_types import Vec2
 from ..state import EventsEnum
@@ -123,6 +123,7 @@ class GameEngine(Engine):
 
     def _respawn_ghost(self, ghost: Ghost) -> None:
         ghost.position = Vec2(ghost.spawn.row, ghost.spawn.col)
+        ghost.prev = ghost.position
         ghost.direction = Direction.NONE
         ghost.is_edible = False
 
@@ -215,6 +216,11 @@ class GameEngine(Engine):
         return (prev.row + (cur.row - prev.row) * frac,
                 prev.col + (cur.col - prev.col) * frac)
 
+    def smooth_position(
+            self, entity: Entity, progress: float) -> tuple[float, float]:
+        return self._interp(
+            entity.prev, entity.position, min(1.0, progress / _STEP_COST))
+
     def _check_collisions(self) -> None:
         pr, pc = self._interp(
             self.pacman.prev,
@@ -235,6 +241,7 @@ class GameEngine(Engine):
     def _lose_life(self) -> None:
         self.lives -= 1
         self.pacman.position = Vec2(*self.map.middle)
+        self.pacman.prev = self.pacman.position
         self.pacman.direction = Direction.NONE
         self.requested = Direction.NONE
         self.pacman_progress = 0.0
