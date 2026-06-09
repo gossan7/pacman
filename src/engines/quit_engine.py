@@ -11,7 +11,7 @@ ACTIONS = {
     "NO": (None, 1)
 }
 
-TEXT_TO_DISPLAY = "Do you wanna quit ?"
+TEXT_TO_DISPLAY = "QUIT ?"
 
 
 class QuitEngine(RegionPopupEngine):
@@ -24,6 +24,7 @@ class QuitEngine(RegionPopupEngine):
         to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
         if REGIONS[self.hover_on] == "YES":
             to_remove = globalstate.to_quit
+            to_add = globalstate.to_add_on_quit
         globalstate.to_remove += to_remove
         if to_add:
             globalstate.to_add = to_add

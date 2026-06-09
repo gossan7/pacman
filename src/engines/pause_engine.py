@@ -4,17 +4,19 @@ from ..state import EngineFlag
 
 REGIONS = [
     "RESUME",
+    "CONTROLS",
     "OPTIONS",
     "QUIT"
 ]
 
 ACTIONS = {
     "RESUME": (None, 1),
+    "CONTROLS": (EngineFlag.CONTROLS, 0),
     "OPTIONS": (EngineFlag.OPTIONS, 0),
     "QUIT": (EngineFlag.QUIT, 0)
 }
 
-TEXT_TO_DISPLAY = "PAUSE"
+TEXT_TO_DISPLAY = "QUIT ?"
 
 
 class PauseEngine(RegionPopupEngine):
@@ -26,7 +28,7 @@ class PauseEngine(RegionPopupEngine):
     def activate_current_hover(self, globalstate):
         to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
         if REGIONS[self.hover_on] == "QUIT":
-            to_remove = globalstate.to_quit = 3
+            globalstate.to_add_on_quit = EngineFlag.MENU
         globalstate.to_remove += to_remove
         if to_add:
             globalstate.to_add = to_add

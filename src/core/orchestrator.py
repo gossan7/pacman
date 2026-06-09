@@ -9,16 +9,17 @@ from ..engines import (
     PauseEngine,
     CheatEngine,
     ScoresEngine,
-    QuitEngine
+    QuitEngine,
+    ControlsEngine
 )
 from ..renderers import (
     Renderer,
     WindowHandler,
     MenuRenderer,
     GameRenderer,
-    PauseRenderer,
     RegionPopupRenderer,
-    ScoresRenderer
+    ScoresRenderer,
+    ControlsRenderer
 )
 from ..state import EngineFlag, GlobalState
 from .input_handler import InputHandler
@@ -27,10 +28,11 @@ from .input_handler import InputHandler
 ENGINES: list[tuple[EngineFlag, Type[Engine], Type[Renderer]]] = [
     (EngineFlag.MENU, MenuEngine, MenuRenderer),
     (EngineFlag.GAME, GameEngine, GameRenderer),
-    (EngineFlag.PAUSE, PauseEngine, PauseRenderer),
+    (EngineFlag.PAUSE, PauseEngine, RegionPopupRenderer),
     (EngineFlag.CHEAT, CheatEngine, RegionPopupRenderer),
     (EngineFlag.SCORES, ScoresEngine, ScoresRenderer),
-    (EngineFlag.QUIT, QuitEngine, RegionPopupRenderer)
+    (EngineFlag.QUIT, QuitEngine, RegionPopupRenderer),
+    (EngineFlag.CONTROLS, ControlsEngine, ControlsRenderer)
 ]
 
 

@@ -30,6 +30,7 @@ def init_window():
     width = int(pyray.get_monitor_width(0) / 1.5)
     height = int(pyray.get_monitor_height(0) / 1.5)
     pyray.set_window_size(width, height)
+    pyray.set_exit_key(pyray.KeyboardKey.KEY_NULL)
 
 
 def main() -> None:

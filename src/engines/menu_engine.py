@@ -8,15 +8,13 @@ REGIONS = [
     "PLAY",
     "SCORES",
     "CONTROLS",
-    "OPTIONS",
     "QUIT"
 ]
 
 ACTIONS = {
     "PLAY": (EngineFlag.GAME, 1),
     "SCORES": (EngineFlag.SCORES, 0),
-    "COTROLS": (EngineFlag.CONTROLS, 0),
-    "OPTIONS": (EngineFlag.OPTIONS, 0),
+    "CONTROLS": (EngineFlag.CONTROLS, 0),
     "QUIT": (EngineFlag.QUIT, 0)
 }
 
@@ -32,6 +30,8 @@ class MenuEngine(Engine):
         globalstate.to_remove += to_remove
         if to_add:
             globalstate.to_add = to_add
+        if to_add == EngineFlag.QUIT:
+            globalstate.to_quit = 2
 
     def update_always(self, globalstate: GlobalState) -> None:
         pass
@@ -48,3 +48,4 @@ class MenuEngine(Engine):
                     self.activate_current_hover(globalstate)
                 case EventsEnum.ESCAPE:
                     globalstate.to_add = EngineFlag.QUIT
+                    globalstate.to_quit = 2

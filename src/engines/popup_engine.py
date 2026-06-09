@@ -2,7 +2,7 @@ from typing import Any
 from abc import abstractmethod
 
 from .engine import Engine
-from ..state import GlobalState, EngineFlag, EventsEnum
+from ..state import GlobalState, EventsEnum
 
 
 class RegionPopupEngine(Engine):
@@ -27,7 +27,7 @@ class RegionPopupEngine(Engine):
                 case EventsEnum.ENTER:
                     self.activate_current_hover(globalstate)
                 case EventsEnum.ESCAPE:
-                    globalstate.to_add = EngineFlag.QUIT
+                    globalstate.to_remove = 1
 
     def update_focus(self, globalstate: GlobalState) -> None:
         pass
