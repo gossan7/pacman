@@ -3,7 +3,7 @@ from typing import Any
 from .engine import Engine
 from ..state import GlobalState
 from ..instances import Pacman, Map, Ghost, Entity
-from ..state import EngineFlag, GhostKind
+from ..state import EngineFlag, GhostKind, GhostMode
 from ..pacman_types import Vec2
 from ..state import EventsEnum
 from ..instances import Direction, SuperGum
@@ -18,13 +18,19 @@ EVENT_TO_DIRECTION: dict[EventsEnum, Direction] = {
 
 _STEP_COST = 100
 _EAT_AT = 7 * _STEP_COST // 10
-_HIT_AT = 6 * _STEP_COST // 10
+_FREEZE_TIME = 1.5
+_GO_TIME = 1.0
+_EYES_TIME = 1.0
+_OUTRO_TIME = 2.0
+_RESPAWN_TIME = 2.0
+_DEATH_TIME = 1.0
 
 OPPOSITE = {Direction.NORTH: Direction.SOUTH, Direction.SOUTH: Direction.NORTH,
             Direction.EAST: Direction.WEST, Direction.WEST: Direction.EAST,
             Direction.NONE: Direction.NONE}
 
 _PRIORITY = (Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST)
+_FRIGHTENED_SPEED = 0.5
 
 
 class GameEngine(Engine):
@@ -36,7 +42,10 @@ class GameEngine(Engine):
         self.pacman_speed: float = config["pacman_speed"]
         self.ghost_speed: float = config["ghost_speed"]
         self.frightened_duration: float = config["frightened_duration"]
-        self.hitbox_radius: int = 0.2
+        self.hitbox_radius: float = 0.2
+        self.intro_remaining: float = 0.0
+        self.outro_remaining: float = 0.0
+        self.death_remaining: float = 0.0
         self.lives: int = config["lives"]
         self.score: int = 0
         self.level: int = 1
@@ -67,6 +76,7 @@ class GameEngine(Engine):
         ]
         self.level_remaining = float(self.level_max_time)
         self.frightened_remaining = 0.0
+        self._start_intro()
 
     def _advance_level(self) -> None:
         self.level += 1
@@ -102,12 +112,14 @@ class GameEngine(Engine):
         if isinstance(content, SuperGum):
             self._enter_frightened()
         if self.map.gums_remaining == 0:
-            self._advance_level()
+            self.outro_remaining = _OUTRO_TIME
 
 #    GHOSTS
 
     def _step_ghosts(self) -> None:
         for ghost in self.ghosts:
+            if ghost.mode != GhostMode.ALIVE:
+                continue
             ghost.prev = ghost.position
             direction = self._choose_direction(ghost)
             if direction != Direction.NONE and self.map.can_move(
@@ -123,9 +135,12 @@ class GameEngine(Engine):
 
     def _respawn_ghost(self, ghost: Ghost) -> None:
         ghost.position = Vec2(ghost.spawn.row, ghost.spawn.col)
-        ghost.prev = ghost.position
+        ghost.prev = Vec2(ghost.spawn.row, ghost.spawn.col)
         ghost.direction = Direction.NONE
         ghost.is_edible = False
+        ghost.mode = GhostMode.ALIVE
+        ghost.eyes_remaining = 0.0
+        ghost.respawn_remaining = 0.0
 
     @staticmethod
     def _dist2(a: Vec2, b: Vec2) -> int:
@@ -175,6 +190,8 @@ class GameEngine(Engine):
     def _enter_frightened(self) -> None:
         self.frightened_remaining = self.frightened_duration
         for ghost in self.ghosts:
+            if ghost.mode != GhostMode.ALIVE:
+                continue
             ghost.is_edible = True
             ghost.direction = OPPOSITE[ghost.direction]
 
@@ -183,11 +200,37 @@ class GameEngine(Engine):
         for ghost in self.ghosts:
             ghost.is_edible = False
 
+    def _kill_ghost(self, ghost: Ghost) -> None:
+        self.score += self.ghost_val
+        ghost.mode = GhostMode.EYES
+        ghost.is_edible = False
+        ghost.eyes_from = Vec2(ghost.position.row, ghost.position.col)
+        ghost.eyes_remaining = _EYES_TIME
+        ghost.direction = Direction.NONE
+
+    def _begin_respawn(self, ghost: Ghost) -> None:
+        ghost.mode = GhostMode.RESPAWNING
+        ghost.respawn_remaining = _RESPAWN_TIME
+        ghost.position = Vec2(ghost.spawn.row, ghost.spawn.col)
+        ghost.prev = Vec2(ghost.spawn.row, ghost.spawn.col)
+        ghost.direction = Direction.NONE
+
     def _blinky_position(self) -> Vec2:
         for ghost in self.ghosts:
             if ghost.kind == GhostKind.BLINKY:
                 return ghost.position
         return self.pacman.position
+
+    def _tick_ghost_states(self, dt: float) -> None:
+        for ghost in self.ghosts:
+            if ghost.mode == GhostMode.EYES:
+                ghost.eyes_remaining -= dt
+                if ghost.eyes_remaining <= 0:
+                    self._begin_respawn(ghost)
+            elif ghost.mode == GhostMode.RESPAWNING:
+                ghost.respawn_remaining -= dt
+                if ghost.respawn_remaining <= 0:
+                    ghost.mode = GhostMode.ALIVE
 
     def _tick_frightened(self, dt: float) -> None:
         if self.frightened_remaining <= 0:
@@ -204,7 +247,58 @@ class GameEngine(Engine):
             pos = self.map.destination(pos, direction)
         return pos
 
+    def _current_ghost_speed(self) -> float:
+        if self.frightened_remaining > 0:
+            return self.ghost_speed * _FRIGHTENED_SPEED
+        return self.ghost_speed
+
 #    GLOBAL
+
+    def _start_intro(self) -> None:
+        self.intro_remaining = _FREEZE_TIME + _GO_TIME
+
+    def _tick_intro(self, dt: float) -> bool:
+        if self.intro_remaining <= 0:
+            return False
+        self.intro_remaining -= dt
+        return self.intro_remaining > _GO_TIME
+
+    def _tick_outro(self, dt: float) -> bool:
+        if self.outro_remaining <= 0:
+            return False
+        self.outro_remaining -= dt
+        if self.outro_remaining <= 0:
+            self._advance_level()
+        return True
+
+    def _start_death(self) -> None:
+        self.death_remaining = _DEATH_TIME
+
+    def _tick_death(self, dt: float) -> bool:
+        if self.death_remaining <= 0:
+            return False
+        self.death_remaining -= dt
+        if self.death_remaining <= 0:
+            self._lose_life()
+        return True
+
+    def death_fraction(self) -> float | None:
+        if self.death_remaining <= 0:
+            return None
+        frac = 1.0 - max(0.0, self.death_remaining) / _DEATH_TIME
+        return min(1.0, max(0.0, frac))
+
+    def intro_label(self) -> str | None:
+        if self.intro_remaining <= 0:
+            return None
+        if self.intro_remaining > _GO_TIME:
+            return "READY ?"
+        return "GO !"
+
+    def banner_label(self) -> str | None:
+        if self.outro_remaining > 0:
+            return "CONGRATULATIONS !"
+        return self.intro_label()
 
     def _read_input(self, globalstate: GlobalState) -> None:
         for event in globalstate.events:
@@ -221,6 +315,22 @@ class GameEngine(Engine):
         return self._interp(
             entity.prev, entity.position, min(1.0, progress / _STEP_COST))
 
+    def ghost_render_position(
+            self, ghost: Ghost, progress: float) -> tuple[float, float]:
+        if ghost.mode == GhostMode.EYES:
+            frac = 1.0 - max(0.0, ghost.eyes_remaining) / _EYES_TIME
+            frac = min(1.0, max(0.0, frac))
+            return self._interp(ghost.eyes_from, ghost.spawn, frac)
+        if ghost.mode == GhostMode.RESPAWNING:
+            return float(ghost.spawn.row), float(ghost.spawn.col)
+        return self.smooth_position(ghost, progress)
+
+    def ghost_alpha(self, ghost: Ghost) -> int:
+        if ghost.mode != GhostMode.RESPAWNING:
+            return 255
+        frac = 1.0 - ghost.respawn_remaining / _RESPAWN_TIME
+        return int(255 * min(1.0, max(0.0, frac)))
+
     def _check_collisions(self) -> None:
         pr, pc = self._interp(
             self.pacman.prev,
@@ -228,14 +338,15 @@ class GameEngine(Engine):
             self.pacman_progress / _STEP_COST)
         gf = self.ghost_progress / _STEP_COST
         for ghost in self.ghosts:
+            if ghost.mode != GhostMode.ALIVE:
+                continue
             gr, gc = self._interp(ghost.prev, ghost.position, gf)
             if (pr - gr) ** 2 + (pc - gc) ** 2 >= (2 * self.hitbox_radius)**2:
                 continue
             if ghost.is_edible:
-                self.score += self.ghost_val
-                self._respawn_ghost(ghost)
+                self._kill_ghost(ghost)
             else:
-                self._lose_life()
+                self._start_death()
                 return
 
     def _lose_life(self) -> None:
@@ -250,6 +361,7 @@ class GameEngine(Engine):
             self._respawn_ghost(ghost)
         if self.lives <= 0:
             self.game_ended = True
+        self._start_intro()
 
     def _tick_level_timer(self, dt: float) -> None:
         self.level_remaining -= dt
@@ -273,8 +385,19 @@ class GameEngine(Engine):
 
     def update_focus(self, globalstate: GlobalState) -> None:
         self._read_input(globalstate)
+        if self._tick_death(globalstate.delta_time):
+            if self.game_ended:
+                self._end_game(globalstate)
+            return
+        if self._tick_outro(globalstate.delta_time):
+            if self.game_ended:
+                self._end_game(globalstate)
+            return
+        if self._tick_intro(globalstate.delta_time):
+            return
         self._tick_frightened(globalstate.delta_time)
         self._tick_level_timer(globalstate.delta_time)
+        self._tick_ghost_states(globalstate.delta_time)
 
         # PACMAN
         self.pacman_progress += self.pacman_speed
@@ -287,7 +410,7 @@ class GameEngine(Engine):
                 break
 
         # GHOSTS
-        self.ghost_progress += self.ghost_speed
+        self.ghost_progress += self._current_ghost_speed()
         while self.ghost_progress >= _STEP_COST and not self.game_ended:
             self.ghost_progress -= _STEP_COST
             self._step_ghosts()

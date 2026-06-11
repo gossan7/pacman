@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 import pyray
 
@@ -5,7 +7,7 @@ from .renderer import Renderer
 from ..engines import GameEngine
 from .window_handler import WindowHandler, WORLD_WIDTH, WORLD_HEIGHT
 from ..instances import Direction, SuperGum, Ghost
-from ..state import GhostKind
+from ..state import GhostKind, GhostMode
 
 
 HUD_HEIGHT = 90
@@ -37,12 +39,20 @@ GHOST_BASE_ROW = {
     GhostKind.INKY: 8,
     GhostKind.PINKY: 12,
 }
+EYE_FRAMES = {
+    Direction.NORTH: (1, 17),
+    Direction.SOUTH: (0, 16),
+    Direction.WEST: (1, 16),
+    Direction.EAST: (0, 17),
+}
 DIR_OFFSET = {
     Direction.SOUTH: 0,
     Direction.WEST: 1,
     Direction.EAST: 2,
     Direction.NORTH: 3,
 }
+DEATH_FRAMES = (9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+
 FRIGHTENED_ROW = 18
 FRIGHTENED_FLASH_ROW = 19
 FLASH_AT = 2.0
@@ -124,8 +134,8 @@ class GameRenderer(Renderer):
                     continue
                 y = s(oy + vr * cell)
                 x0 = s(ox + vc * cell) + (sr if self._is_turn(vr, vc) else 0)
-                x1 = s(ox + (vc + 1) * cell) \
-                    - (sr if self._is_turn(vr, vc + 1) else 0)
+                x1 = s(ox + (vc + 1) * cell) - \
+                    (sr if self._is_turn(vr, vc + 1) else 0)
                 pyray.draw_line_ex(
                     pyray.Vector2(x0, y), pyray.Vector2(x1, y),
                     st, WALL_COLOR)
@@ -171,7 +181,10 @@ class GameRenderer(Renderer):
 
     def _draw_sprite(
             self, sheet: pyray.Texture, col: int, row: int,
-            cx: int, cy: int, size: int) -> None:
+            cx: int, cy: int, size: int,
+            tint: pyray.Color | None = None) -> None:
+        if tint is None:
+            tint = pyray.WHITE
         inset = 0.05
         src = pyray.Rectangle(
             col * SPRITE_PX + inset,
@@ -180,7 +193,7 @@ class GameRenderer(Renderer):
             SPRITE_PX - 2 * inset)
         dst = pyray.Rectangle(cx, cy, size, size)
         origin = pyray.Vector2(size / 2, size / 2)
-        pyray.draw_texture_pro(sheet, src, dst, origin, 0.0, pyray.WHITE)
+        pyray.draw_texture_pro(sheet, src, dst, origin, 0.0, tint)
 
     def _ghost_row(self, ghost: Ghost) -> int:
         if ghost.is_edible:
@@ -189,6 +202,15 @@ class GameRenderer(Renderer):
                 return FRIGHTENED_FLASH_ROW
             return FRIGHTENED_ROW
         return GHOST_BASE_ROW[ghost.kind] + DIR_OFFSET.get(ghost.direction, 0)
+
+    def _eyes_frame(self, ghost: Ghost) -> tuple[int, int]:
+        dr = ghost.spawn.row - ghost.eyes_from.row
+        dc = ghost.spawn.col - ghost.eyes_from.col
+        if abs(dr) >= abs(dc):
+            facing = Direction.NORTH if dr < 0 else Direction.SOUTH
+        else:
+            facing = Direction.WEST if dc < 0 else Direction.EAST
+        return EYE_FRAMES[facing]
 
     # RENDER
 
@@ -247,21 +269,38 @@ class GameRenderer(Renderer):
             step = 2
         else:
             step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
-        index = PAC_FRAMES[pac.direction][step]
+        death = self.engine.death_fraction()
+        if death is not None:
+            di = min(len(DEATH_FRAMES) - 1, int(death * len(DEATH_FRAMES)))
+            index = DEATH_FRAMES[di]
+        elif pac.prev == pac.position:
+            index = PAC_FRAMES[pac.direction][2]
+        else:
+            step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
+            index = PAC_FRAMES[pac.direction][step]
         self._draw_sprite(
             self.pac_sheet, index % PAC_COLS, index // PAC_COLS,
             to_screen(pcx), to_screen(pcy), sprite)
 
         # GHOSTS
-        anim = (self.frame // 8) % 2
-        for ghost in self.engine.ghosts:
-            grow, gcol = self.engine.smooth_position(
-                ghost, self.engine.ghost_progress)
-            gx = ox + int(gcol * cell) + half
-            gy = oy + int(grow * cell) + half
-            self._draw_sprite(
-                self.ghost_sheet, anim, self._ghost_row(ghost),
-                to_screen(gx), to_screen(gy), sprite)
+        if death is None:
+            anim = (self.frame // 8) % 2
+            for ghost in self.engine.ghosts:
+                grow, gcol = self.engine.ghost_render_position(
+                    ghost, self.engine.ghost_progress)
+                gx = ox + int(gcol * cell) + half
+                gy = oy + int(grow * cell) + half
+                tint = pyray.Color(
+                    255, 255, 255, self.engine.ghost_alpha(ghost))
+                if ghost.mode == GhostMode.EYES:
+                    ecol, erow = self._eyes_frame(ghost)
+                    self._draw_sprite(
+                        self.ghost_sheet, ecol, erow,
+                        to_screen(gx), to_screen(gy), sprite, tint)
+                else:
+                    self._draw_sprite(
+                        self.ghost_sheet, anim, self._ghost_row(ghost),
+                        to_screen(gx), to_screen(gy), sprite, tint)
 
         # HUD
         font = to_screen(HUD_FONT)
@@ -278,6 +317,13 @@ class GameRenderer(Renderer):
             pyray.draw_text(
                 text, to_screen(MARGIN + i * colw), hy, font, pyray.WHITE)
 
+        label = self.engine.banner_label()
+        if label is not None:
+            big = to_screen(HUD_FONT + 12)
+            tw = pyray.measure_text(label, big)
+            bx = to_screen(WORLD_WIDTH // 2) - tw // 2
+            by = to_screen(MARGIN + HUD_FONT + 8)
+            pyray.draw_text(label, bx, by, big, pyray.YELLOW)
         if self.frame == _FRAMES_ANIMATION:
             self.frame = 0
         else:
