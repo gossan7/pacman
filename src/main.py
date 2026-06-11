@@ -9,8 +9,8 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
     res: dict[str, Any] = {
         "fps": 30,
         "seed": 42,
-        "width": 20,
-        "height": 20,
+        "width": 10,
+        "height": 10,
         "lives": 3,
         "gum_val": 10,
         "supergum_val": 50,

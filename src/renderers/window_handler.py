@@ -18,3 +18,6 @@ class WindowHandler:
 
     def to_screen(self, n: int) -> int:
         return int(n * self.ratio)
+
+    def to_ratio(self, n: int) -> float:
+        return n * self.ratio

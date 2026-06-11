@@ -11,10 +11,9 @@ from ..state import GhostKind
 HUD_HEIGHT = 90
 MARGIN = 20
 HUD_FONT = 36
-HUD_SPACING = 60
 
-PACMAN_SHEET = "assets/pacman.png"
-GHOSTS_SHEET = "assets/ghosts.png"
+PACMAN_SHEET = str("assets/pacman.png")
+GHOSTS_SHEET = str("assets/ghosts.png")
 
 WALL_COLOR = pyray.Color(33, 33, 222, 255)
 GUM_COLOR = pyray.Color(255, 220, 180, 255)
@@ -50,6 +49,9 @@ FLASH_AT = 2.0
 
 _FRAMES_ANIMATION = 30
 
+# segments incidents a un sommet, par virage -> (centre dx/dy, angles)
+_TURNS = ({"U", "D"}, {"L", "R"})
+
 
 class GameRenderer(Renderer):
     def __init__(
@@ -64,6 +66,8 @@ class GameRenderer(Renderer):
         self.frame: int = 0
         self.pac_sheet = self._load_sheet(PACMAN_SHEET)
         self.ghost_sheet = self._load_sheet(GHOSTS_SHEET)
+        self._maze_tex: Any = None
+        self._created_map: Any = None
 
     def _load_sheet(self, path: str) -> pyray.Texture:
         img = pyray.load_image(path)
@@ -76,12 +80,104 @@ class GameRenderer(Renderer):
     def unload(self) -> None:
         pyray.unload_texture(self.pac_sheet)
         pyray.unload_texture(self.ghost_sheet)
+        if self._maze_tex is not None:
+            pyray.unload_render_texture(self._maze_tex)
+
+    # MAP CREATORS
+
+    def _wall(self, r: int, c: int, bit: Direction) -> bool:
+        m = self.engine.map
+        if r < 0 or c < 0 or r >= m.height or c >= m.width:
+            return False
+        return bool(m.game_map[r][c].walls & bit)
+
+    def _segments(self, vr: int, vc: int) -> set:
+        seg = set()
+        if self._wall(vr - 1, vc, Direction.WEST) \
+                or self._wall(vr - 1, vc - 1, Direction.EAST):
+            seg.add("U")
+        if self._wall(vr, vc, Direction.WEST) \
+                or self._wall(vr, vc - 1, Direction.EAST):
+            seg.add("D")
+        if self._wall(vr, vc - 1, Direction.NORTH) \
+                or self._wall(vr - 1, vc - 1, Direction.SOUTH):
+            seg.add("L")
+        if self._wall(vr, vc, Direction.NORTH) \
+                or self._wall(vr - 1, vc, Direction.SOUTH):
+            seg.add("R")
+        return seg
+
+    def _is_turn(self, vr: int, vc: int) -> bool:
+        seg = self._segments(vr, vc)
+        return len(seg) == 2 and seg not in _TURNS
+
+    def _create_walls(self, cell: int, thick: int, ox: int, oy: int) -> None:
+        s = self.window_handler.to_ratio
+        r = max(thick, cell / 3)
+        sr, st = s(r), s(thick)
+        rows, cols = self.engine.map.height, self.engine.map.width
+        pyray.begin_texture_mode(self._maze_tex)
+        pyray.clear_background(pyray.BLANK)
+        for vr in range(rows + 1):
+            for vc in range(cols):
+                if "R" not in self._segments(vr, vc):
+                    continue
+                y = s(oy + vr * cell)
+                x0 = s(ox + vc * cell) + (sr if self._is_turn(vr, vc) else 0)
+                x1 = s(ox + (vc + 1) * cell) \
+                    - (sr if self._is_turn(vr, vc + 1) else 0)
+                pyray.draw_line_ex(
+                    pyray.Vector2(x0, y), pyray.Vector2(x1, y),
+                    st, WALL_COLOR)
+        for vr in range(rows):
+            for vc in range(cols + 1):
+                if "D" not in self._segments(vr, vc):
+                    continue
+                x = s(ox + vc * cell)
+                y0 = s(oy + vr * cell) + (sr if self._is_turn(vr, vc) else 0)
+                y1 = s(oy + (vr + 1) * cell) \
+                    - (sr if self._is_turn(vr + 1, vc) else 0)
+                pyray.draw_line_ex(
+                    pyray.Vector2(x, y0), pyray.Vector2(x, y1),
+                    st, WALL_COLOR)
+        for vr in range(rows + 1):
+            for vc in range(cols + 1):
+                self._create_vertex(vr, vc, cell, ox, oy, sr, st)
+        pyray.end_texture_mode()
+
+    def _create_vertex(self, vr: int, vc: int, cell: int,
+                       ox: int, oy: int, sr: int, st: int) -> None:
+        s = self.window_handler.to_ratio
+        seg = self._segments(vr, vc)
+        if not seg:
+            return
+        sx, sy = s(ox + vc * cell), s(oy + vr * cell)
+        if len(seg) == 2 and seg not in _TURNS:
+            cx = sx + (sr if "R" in seg else -sr)
+            cy = sy + (sr if "D" in seg else -sr)
+            center = pyray.Vector2(cx, cy)
+            if seg == {"D", "R"}:
+                a0, a1 = 180, 270
+            elif seg == {"D", "L"}:
+                a0, a1 = 270, 360
+            elif seg == {"U", "R"}:
+                a0, a1 = 90, 180
+            else:
+                a0, a1 = 0, 90
+            pyray.draw_ring(center, sr - st / 2, sr + st / 2, a0, a1,
+                            128, WALL_COLOR)
+
+    # ENTITIES
 
     def _draw_sprite(
             self, sheet: pyray.Texture, col: int, row: int,
             cx: int, cy: int, size: int) -> None:
+        inset = 0.05
         src = pyray.Rectangle(
-            col * SPRITE_PX, row * SPRITE_PX, SPRITE_PX, SPRITE_PX)
+            col * SPRITE_PX + inset,
+            row * SPRITE_PX + inset,
+            SPRITE_PX - 2 * inset,
+            SPRITE_PX - 2 * inset)
         dst = pyray.Rectangle(cx, cy, size, size)
         origin = pyray.Vector2(size / 2, size / 2)
         pyray.draw_texture_pro(sheet, src, dst, origin, 0.0, pyray.WHITE)
@@ -94,32 +190,7 @@ class GameRenderer(Renderer):
             return FRIGHTENED_ROW
         return GHOST_BASE_ROW[ghost.kind] + DIR_OFFSET.get(ghost.direction, 0)
 
-    def _wall_line(self, x0, y0, x1, y1, t) -> None:
-        s = self.window_handler.to_screen
-        pyray.draw_line_ex(
-            pyray.Vector2(s(x0), s(y0)), pyray.Vector2(s(x1), s(y1)),
-            s(t), WALL_COLOR)
-
-    def _draw_walls(self, board, x, y, cell, t) -> None:
-        s = self.window_handler.to_screen
-        x1, y1 = x + cell, y + cell
-        if board.walls & Direction.NORTH:
-            self._wall_line(x, y, x1, y, t)
-        if board.walls & Direction.SOUTH:
-            self._wall_line(x, y1, x1, y1, t)
-        if board.walls & Direction.WEST:
-            self._wall_line(x, y, x, y1, t)
-        if board.walls & Direction.EAST:
-            self._wall_line(x1, y, x1, y1, t)
-        corners = (
-            (x, y, Direction.NORTH | Direction.WEST),
-            (x1, y, Direction.NORTH | Direction.EAST),
-            (x, y1, Direction.SOUTH | Direction.WEST),
-            (x1, y1, Direction.SOUTH | Direction.EAST),
-        )
-        for px, py, mask in corners:
-            if board.walls & mask:
-                pyray.draw_circle(s(px), s(py), s(t) / 2, WALL_COLOR)
+    # RENDER
 
     def render(self) -> None:
         to_screen = self.window_handler.to_screen
@@ -134,23 +205,37 @@ class GameRenderer(Renderer):
         ox = (WORLD_WIDTH - cell * cols) // 2
         oy = HUD_HEIGHT + MARGIN + (area_h - cell * rows) // 2
         half = cell // 2
+        sprite = to_screen(int(cell * SPRITE_SCALE))
 
-        # MAP
+        # WALLS
+        if self._maze_tex is None:
+            w, h = self.window_handler.dimensions
+            self._maze_tex = pyray.load_render_texture(w, h)
+            self._created_map = None
+        if self.engine.map is not self._created_map:
+            self._create_walls(cell, thick, ox, oy)
+            self._created_map = self.engine.map
+        mtex = self._maze_tex.texture
+        pyray.draw_texture_rec(
+            mtex, pyray.Rectangle(0, 0, mtex.width, -mtex.height),
+            pyray.Vector2(0, 0), pyray.WHITE)
+
+        # GUMS
         for row in range(rows):
             for col in range(cols):
-                board = game_map.game_map[row][col]
-                x, y = ox + col * cell, oy + row * cell
-                self._draw_walls(board, x, y, cell, thick)
-                if board.content is not None:
-                    if isinstance(board.content, SuperGum):
-                        if self.frame < _FRAMES_ANIMATION // 2:
-                            pyray.draw_circle(
-                                to_screen(x + half), to_screen(y + half),
-                                to_screen(int(cell * 0.28)), GUM_COLOR)
-                    else:
+                content = game_map.game_map[row][col].content
+                if content is None:
+                    continue
+                cx = to_screen(ox + col * cell + half)
+                cy = to_screen(oy + row * cell + half)
+                if isinstance(content, SuperGum):
+                    if self.frame < _FRAMES_ANIMATION // 2:
                         pyray.draw_circle(
-                            to_screen(x + half), to_screen(y + half),
-                            to_screen(max(1, int(cell * 0.13))), GUM_COLOR)
+                            cx, cy, to_screen(int(cell * 0.28)), GUM_COLOR)
+                else:
+                    pyray.draw_circle(
+                        cx, cy, to_screen(max(1, int(cell * 0.13))),
+                        GUM_COLOR)
 
         # PACMAN
         pac = self.engine.pacman
@@ -159,13 +244,13 @@ class GameRenderer(Renderer):
         pcx = ox + int(pcol * cell) + half
         pcy = oy + int(prow * cell) + half
         if pac.prev == pac.position:
-            step = 0
+            step = 2
         else:
             step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
         index = PAC_FRAMES[pac.direction][step]
         self._draw_sprite(
             self.pac_sheet, index % PAC_COLS, index // PAC_COLS,
-            to_screen(pcx), to_screen(pcy), to_screen(cell) * SPRITE_SCALE)
+            to_screen(pcx), to_screen(pcy), sprite)
 
         # GHOSTS
         anim = (self.frame // 8) % 2
@@ -176,7 +261,7 @@ class GameRenderer(Renderer):
             gy = oy + int(grow * cell) + half
             self._draw_sprite(
                 self.ghost_sheet, anim, self._ghost_row(ghost),
-                to_screen(gx), to_screen(gy), to_screen(cell) * SPRITE_SCALE)
+                to_screen(gx), to_screen(gy), sprite)
 
         # HUD
         font = to_screen(HUD_FONT)
@@ -187,10 +272,11 @@ class GameRenderer(Renderer):
             f"LIVES {engine.lives}",
             f"TIME {max(0, int(engine.level_remaining))}",
         ]
-        hx, hy = to_screen(MARGIN), to_screen(MARGIN)
-        for text in items:
-            pyray.draw_text(text, hx, hy, font, pyray.WHITE)
-            hx += pyray.measure_text(text, font) + to_screen(HUD_SPACING)
+        colw = (WORLD_WIDTH - 2 * MARGIN) // len(items)
+        hy = to_screen(MARGIN)
+        for i, text in enumerate(items):
+            pyray.draw_text(
+                text, to_screen(MARGIN + i * colw), hy, font, pyray.WHITE)
 
         if self.frame == _FRAMES_ANIMATION:
             self.frame = 0
