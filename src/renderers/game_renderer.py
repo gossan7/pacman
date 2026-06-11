@@ -59,7 +59,6 @@ FLASH_AT = 2.0
 
 _FRAMES_ANIMATION = 30
 
-# segments incidents a un sommet, par virage -> (centre dx/dy, angles)
 _TURNS = ({"U", "D"}, {"L", "R"})
 
 

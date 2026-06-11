@@ -380,7 +380,6 @@ class GameEngine(Engine):
         globalstate.focus = EngineFlag.SCORE
 
     def update_always(self, globalstate: GlobalState) -> None:
-        # rien a priori
         pass
 
     def update_focus(self, globalstate: GlobalState) -> None:
@@ -404,7 +403,6 @@ class GameEngine(Engine):
         while self.pacman_progress >= _STEP_COST and not self.game_ended:
             if self._step_pacman():
                 self.pacman_progress -= _STEP_COST
-                # self._check_collisions()
             else:
                 self.pacman_progress = _STEP_COST
                 break
