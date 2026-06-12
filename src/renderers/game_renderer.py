@@ -259,30 +259,28 @@ class GameRenderer(Renderer):
                         GUM_COLOR)
 
         # PACMAN
+        over = self.engine.game_ended
         pac = self.engine.pacman
         prow, pcol = self.engine.smooth_position(
             pac, self.engine.pacman_progress)
         pcx = ox + int(pcol * cell) + half
         pcy = oy + int(prow * cell) + half
-        if pac.prev == pac.position:
-            step = 2
-        else:
-            step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
         death = self.engine.death_fraction()
-        if death is not None:
-            di = min(len(DEATH_FRAMES) - 1, int(death * len(DEATH_FRAMES)))
-            index = DEATH_FRAMES[di]
-        elif pac.prev == pac.position:
-            index = PAC_FRAMES[pac.direction][2]
-        else:
-            step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
-            index = PAC_FRAMES[pac.direction][step]
-        self._draw_sprite(
-            self.pac_sheet, index % PAC_COLS, index // PAC_COLS,
-            to_screen(pcx), to_screen(pcy), sprite)
+        if not over:
+            if death is not None:
+                di = min(len(DEATH_FRAMES) - 1, int(death * len(DEATH_FRAMES)))
+                index = DEATH_FRAMES[di]
+            elif pac.prev == pac.position:
+                index = PAC_FRAMES[pac.direction][2]
+            else:
+                step = _CHOMP[(self.frame // 4) % len(_CHOMP)]
+                index = PAC_FRAMES[pac.direction][step]
+            self._draw_sprite(
+                self.pac_sheet, index % PAC_COLS, index // PAC_COLS,
+                to_screen(pcx), to_screen(pcy), sprite)
 
         # GHOSTS
-        if death is None:
+        if death is None and not over:
             anim = (self.frame // 8) % 2
             for ghost in self.engine.ghosts:
                 grow, gcol = self.engine.ghost_render_position(

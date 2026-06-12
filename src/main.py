@@ -19,7 +19,7 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
         "frightened_duration": 7.0,
         "pacman_speed": 15,
         "ghost_speed": 7,
-        "num_levels": 10,
+        "num_levels": 1,
         "highscore_filename": "highSCORE.json",
     }
     return res

@@ -351,6 +351,9 @@ class GameEngine(Engine):
 
     def _lose_life(self) -> None:
         self.lives -= 1
+        if self.lives <= 0:
+            self.game_ended = True
+            return
         self.pacman.position = Vec2(*self.map.middle)
         self.pacman.prev = self.pacman.position
         self.pacman.direction = Direction.NONE
@@ -359,8 +362,6 @@ class GameEngine(Engine):
         self.ghost_progress = 0.0
         for ghost in self.ghosts:
             self._respawn_ghost(ghost)
-        if self.lives <= 0:
-            self.game_ended = True
         self._start_intro()
 
     def _tick_level_timer(self, dt: float) -> None:
