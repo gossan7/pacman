@@ -1,8 +1,6 @@
-from abc import ABC, abstractmethod
-import random
-
-from ..pacman_types import Vec2
+from abc import ABC
 from .direction import Direction
+from ..pacman_types import Vec2
 
 
 class Entity(ABC):
@@ -16,24 +14,12 @@ class Entity(ABC):
         the mazegenerator and do bitwise operations"""
         self.direction: Direction = direction
         self.position: Vec2 = position
+        self.prev: Vec2 = Vec2(position.row, position.col)
 
     @staticmethod
     def is_valid_direction(value: int) -> bool:
         """Maybe overkill, used to validate a direction"""
         return value != 0 and (value & (value - 1)) == 0 and value <= 8
 
-    def _choose_random(
-            self,
-            possible_directions: list[Direction]
-    ) -> Direction:
-        """Placeholder-like to generate a random walk,
-        the list of directions is supposed to be a list of valid directions
-        (need a map and a position to do so) given by the GameEngine
-        """
-        return random.choice(possible_directions)
-
-    @abstractmethod
-    def update_direction(self, possible_directions: list[Direction]) -> None:
-        """For pacman : changes the direction based on inputs
-        For ghosts : passing a map then updating according to behaviour"""
-        pass
+    def update_direction(self, direction: Direction) -> None:
+        self.direction = direction

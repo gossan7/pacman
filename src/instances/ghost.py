@@ -1,15 +1,21 @@
 from .entity import Entity
 from .direction import Direction
 from ..pacman_types import Vec2
+from ..state import GhostKind, GhostMode
 
 
 class Ghost(Entity):
     def __init__(
             self,
             position: Vec2,
-            direction: Direction = Direction.NORTH
+            ghost_kind: GhostKind,
+            direction: Direction = Direction.NONE,
     ) -> None:
         super().__init__(position, direction)
-
-    def update_direction(self, possible_directions: list[Direction]) -> None:
-        self._choose_random(possible_directions)
+        self.is_edible: bool = False
+        self.spawn: Vec2 = Vec2(position.row, position.col)
+        self.kind: GhostKind = ghost_kind
+        self.mode: GhostMode = GhostMode.ALIVE
+        self.eyes_from: Vec2 = Vec2(position.row, position.col)
+        self.eyes_remaining: float = 0.0
+        self.respawn_remaining: float = 0.0

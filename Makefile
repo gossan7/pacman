@@ -17,7 +17,7 @@ run: $(INSTALL_STAMP)
 	@$(RUN) pac-man.py $(ARGS)
 
 debug: $(INSTALL_STAMP)
-	@$(RUN) -m pdb -m src $(ARGS)
+	@$(RUN) pac-man.py $(ARGS)
 
 lint: $(INSTALL_STAMP)
 	$(FLAKE8) src
