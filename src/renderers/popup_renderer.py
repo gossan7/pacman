@@ -2,7 +2,7 @@ from typing import Any
 import pyray
 
 from .renderer import Renderer
-from ..engines import Engine
+from ..engines import PopupEngine
 from .window_handler import WindowHandler, WORLD_WIDTH, WORLD_HEIGHT
 
 
@@ -16,11 +16,11 @@ class PopupRenderer(Renderer):
     def __init__(
             self,
             config: dict[str, Any],
-            engine: Engine,
+            engine: PopupEngine,
             window_handler: WindowHandler
     ) -> None:
         self.config = config
-        self.engine: Engine = engine
+        self.engine: PopupEngine = engine
         self.window_handler = window_handler
         self.popup_x = (WORLD_WIDTH - POPUP_WIDTH) // 2
         self.popup_y = (WORLD_HEIGHT - POPUP_HEIGHT) // 2
@@ -28,11 +28,12 @@ class PopupRenderer(Renderer):
     def render(self) -> None:
         to_screen = self.window_handler.to_screen
 
-        pyray.draw_rectangle(
-            0, 0,
-            to_screen(WORLD_WIDTH), to_screen(WORLD_HEIGHT),
-            pyray.Color(0, 0, 0, OVERLAY_ALPHA)
-        )
+        if self.engine.popup == 1:
+            pyray.draw_rectangle(
+                0, 0,
+                to_screen(WORLD_WIDTH), to_screen(WORLD_HEIGHT),
+                pyray.Color(0, 0, 0, OVERLAY_ALPHA)
+            )
 
         pyray.draw_rectangle(
             to_screen(self.popup_x),

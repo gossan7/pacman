@@ -30,11 +30,9 @@ class MenuEngine(Engine):
         globalstate.to_remove += to_remove
         if to_add:
             globalstate.to_add = to_add
-        if to_add == EngineFlag.QUIT:
-            globalstate.to_quit = 2
 
     def update_always(self, globalstate: GlobalState) -> None:
-        pass
+        globalstate.to_add_on_quit = None
 
     def update_focus(self, globalstate: GlobalState) -> None:
         while globalstate.events:
@@ -48,4 +46,3 @@ class MenuEngine(Engine):
                     self.activate_current_hover(globalstate)
                 case EventsEnum.ESCAPE:
                     globalstate.to_add = EngineFlag.QUIT
-                    globalstate.to_quit = 2

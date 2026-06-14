@@ -4,7 +4,8 @@ from .game_engine import GameEngine
 from .pause_engine import PauseEngine
 from .cheat_engine import CheatEngine
 from .scores_engine import ScoresEngine
-from .popup_engine import RegionPopupEngine
+from .popup_engine import PopupEngine
+from .region_popup_engine import RegionPopupEngine
 from .quit_engine import QuitEngine
 from .controls_engine import ControlsEngine
 
@@ -17,6 +18,7 @@ __all__ = [
     "CheatEngine",
     "ScoresEngine",
     "ControlsEngine",
+    "PopupEngine",
     "RegionPopupEngine",
     "QuitEngine"
 ]

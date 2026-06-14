@@ -1,27 +1,26 @@
-from .popup_engine import RegionPopupEngine
+from .region_popup_engine import RegionPopupEngine
 from ..state import EngineFlag
 
 
 REGIONS = [
     "RESUME",
     "CONTROLS",
-    "OPTIONS",
     "QUIT"
 ]
 
 ACTIONS = {
     "RESUME": (None, 1),
     "CONTROLS": (EngineFlag.CONTROLS, 0),
-    "OPTIONS": (EngineFlag.OPTIONS, 0),
     "QUIT": (EngineFlag.QUIT, 0)
 }
 
-TEXT_TO_DISPLAY = "QUIT ?"
+TEXT_TO_DISPLAY = "PAUSE"
 
 
 class PauseEngine(RegionPopupEngine):
     def __init__(self, config):
         super().__init__(config)
+        self.flag = EngineFlag.PAUSE
         self.regions = REGIONS
         self.text_to_display = TEXT_TO_DISPLAY
 

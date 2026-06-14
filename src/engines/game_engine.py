@@ -301,9 +301,12 @@ class GameEngine(Engine):
         return self.intro_label()
 
     def _read_input(self, globalstate: GlobalState) -> None:
-        for event in globalstate.events:
+        while globalstate.events:
+            event = globalstate.events.pop()
             if event in EVENT_TO_DIRECTION:
                 self.requested = EVENT_TO_DIRECTION[event]
+            if event == EventsEnum.ESCAPE:
+                globalstate.to_add = EngineFlag.PAUSE
 
     def _interp(
             self, prev: Vec2, cur: Vec2, frac: float) -> tuple[float, float]:
@@ -377,8 +380,8 @@ class GameEngine(Engine):
     def _end_game(self, globalstate: GlobalState) -> None:
         globalstate.score = self.score
         globalstate.won = self.won
-        globalstate.to_add = EngineFlag.SCORE
-        globalstate.focus = EngineFlag.SCORE
+        globalstate.to_add = EngineFlag.SCORE_REGISTER
+        globalstate.focus = EngineFlag.SCORE_REGISTER
 
     def update_always(self, globalstate: GlobalState) -> None:
         pass

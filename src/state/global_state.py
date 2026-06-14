@@ -16,6 +16,5 @@ class GlobalState:
         ]
         self.score: int = 0
         self.won: bool = False
-        self.to_quit: int = 1
         self.to_add_on_quit: EngineFlag | None = None
         self.popup: int = 0

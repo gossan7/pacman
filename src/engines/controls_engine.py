@@ -1,6 +1,6 @@
 from typing import Any
 
-from .engine import Engine
+from . import PopupEngine
 from ..state import GlobalState
 from ..state import EngineFlag, EventsEnum
 
@@ -15,16 +15,14 @@ CONTROLS = [
 ]
 
 
-class ControlsEngine(Engine):
+class ControlsEngine(PopupEngine):
     def __init__(self, config: dict[str, Any]) -> None:
         super().__init__(config)
         self.flag = EngineFlag.CONTROLS
         self.controls = CONTROLS
 
-    def update_always(self, globalstate: GlobalState) -> None:
-        pass
-
     def update_focus(self, globalstate: GlobalState) -> None:
+        super().update_focus(globalstate)
         while globalstate.events:
             event = globalstate.events.pop()
             match event:
