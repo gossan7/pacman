@@ -8,6 +8,7 @@ from .popup_engine import PopupEngine
 from .region_popup_engine import RegionPopupEngine
 from .quit_engine import QuitEngine
 from .controls_engine import ControlsEngine
+from .score_register_engine import ScoreRegisterEngine
 
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     "ControlsEngine",
     "PopupEngine",
     "RegionPopupEngine",
-    "QuitEngine"
+    "QuitEngine",
+    "ScoreRegisterEngine"
 ]

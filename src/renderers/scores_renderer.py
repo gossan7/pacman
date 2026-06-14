@@ -7,8 +7,8 @@ from .window_handler import WindowHandler
 
 
 TEXT_ABOVE = "SCORES"
-TEXT_SIZE_ABOVE = 50
-TEXT_SIZE = 20
+TEXT_SIZE_ABOVE = 40
+TEXT_SIZE = 15
 TEXT_PADDING = 10
 
 

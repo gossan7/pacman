@@ -10,7 +10,8 @@ from ..engines import (
     CheatEngine,
     ScoresEngine,
     QuitEngine,
-    ControlsEngine
+    ControlsEngine,
+    ScoreRegisterEngine
 )
 from ..renderers import (
     Renderer,
@@ -19,7 +20,8 @@ from ..renderers import (
     GameRenderer,
     RegionPopupRenderer,
     ScoresRenderer,
-    ControlsRenderer
+    ControlsRenderer,
+    ScoreRegisterRenderer
 )
 from ..state import EngineFlag, GlobalState
 from .input_handler import InputHandler
@@ -32,13 +34,18 @@ ENGINES: list[tuple[EngineFlag, Type[Engine], Type[Renderer]]] = [
     (EngineFlag.CHEAT, CheatEngine, RegionPopupRenderer),
     (EngineFlag.SCORES, ScoresEngine, ScoresRenderer),
     (EngineFlag.QUIT, QuitEngine, RegionPopupRenderer),
-    (EngineFlag.CONTROLS, ControlsEngine, ControlsRenderer)
+    (EngineFlag.CONTROLS, ControlsEngine, ControlsRenderer),
+    (EngineFlag.SCORE_REGISTER, ScoreRegisterEngine, ScoreRegisterRenderer)
 ]
 
 
 class Orchestrator:
 
-    def __init__(self, config: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        config: dict[str, Any],
+        scores: list[tuple[str, int]] | None = None
+    ) -> None:
         self.window_handler = WindowHandler()
         self.engines: dict[EngineFlag, tuple[Engine, Renderer]] = {}
         for engine_flag, engine_class, renderer_class in ENGINES:
@@ -47,13 +54,14 @@ class Orchestrator:
             self.engines[engine_flag] = (engine, renderer)
 
         self.config = config
-        self.global_state = GlobalState()
+        self.global_state = GlobalState(scores)
         self.input_handler = InputHandler()
         self.frame_time = 1.0 / config["fps"]
         self.frame_start = perf_counter()
 
     def update_global_state(self) -> None:
         self.global_state.events = self.input_handler.get_formatted_inputs()
+        self.global_state.chars = self.input_handler.chars
 
         for _ in range(min(self.global_state.to_remove,
                            len(self.global_state.engine_stack))):

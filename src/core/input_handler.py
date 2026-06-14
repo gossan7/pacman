@@ -38,8 +38,17 @@ class InputHandler:
                     elif key == Key.f11:
                         self.formatted_inputs["fullscreen"] = True
 
-                elif isinstance(key, KeyCode) and key in WASD:
-                    self.formatted_inputs["direction"] = WASD[key]
+                    elif key == Key.space:
+                        self.formatted_inputs["chars"] += " "
+
+                    elif key == Key.backspace:
+                        self.formatted_inputs["backspace"] = True
+
+                elif isinstance(key, KeyCode) and key.char is not None:
+                    if key in WASD:
+                        self.formatted_inputs["direction"] = WASD[key]
+                    if key.char.isprintable():
+                        self.formatted_inputs["chars"] += key.char
 
         self.listener = Listener(
             on_press=on_press,
@@ -50,8 +59,11 @@ class InputHandler:
             "direction": None,
             "enter": False,
             "escape": False,
-            "fullscreen": False
+            "fullscreen": False,
+            "backspace": False,
+            "chars": ""
         }
+        self.chars: str = ""
 
     def start(self) -> None:
         self.listener.start()
@@ -64,6 +76,8 @@ class InputHandler:
         self.formatted_inputs["enter"] = False
         self.formatted_inputs["escape"] = False
         self.formatted_inputs["fullscreen"] = False
+        self.formatted_inputs["backspace"] = False
+        self.formatted_inputs["chars"] = ""
 
     def get_formatted_inputs(self) -> list[EventsEnum]:
         to_return = []
@@ -76,5 +90,8 @@ class InputHandler:
                 to_return.append(EventsEnum.ESCAPE)
             if self.formatted_inputs["fullscreen"]:
                 to_return.append(EventsEnum.FULLSCREEN)
+            if self.formatted_inputs["backspace"]:
+                to_return.append(EventsEnum.BACKSPACE)
+            self.chars = self.formatted_inputs["chars"]
             self._clear_input()
         return to_return

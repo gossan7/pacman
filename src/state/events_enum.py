@@ -9,3 +9,4 @@ class EventsEnum(Enum):
     ENTER = 4
     ESCAPE = 5
     FULLSCREEN = 6
+    BACKSPACE = 7
