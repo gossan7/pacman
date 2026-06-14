@@ -77,6 +77,7 @@ class GameRenderer(Renderer):
         self.ghost_sheet = self._load_sheet(GHOSTS_SHEET)
         self._maze_tex: Any = None
         self._created_map: Any = None
+        self._tex_dimensions: tuple[int, int] | None = None
 
     def _load_sheet(self, path: str) -> pyray.Texture:
         img = pyray.load_image(path)
@@ -229,9 +230,12 @@ class GameRenderer(Renderer):
         sprite = to_screen(int(cell * SPRITE_SCALE))
 
         # WALLS
-        if self._maze_tex is None:
-            w, h = self.window_handler.dimensions
+        w, h = self.window_handler.dimensions
+        if self._maze_tex is None or self._tex_dimensions != (w, h):
+            if self._maze_tex is not None:
+                pyray.unload_render_texture(self._maze_tex)
             self._maze_tex = pyray.load_render_texture(w, h)
+            self._tex_dimensions = (w, h)
             self._created_map = None
         if self.engine.map is not self._created_map:
             self._create_walls(cell, thick, ox, oy)
