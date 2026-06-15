@@ -7,7 +7,6 @@ from ..state import EngineFlag, GhostKind, GhostMode
 from ..pacman_types import Vec2
 from ..state import EventsEnum
 from ..instances import Direction, SuperGum
-import random
 
 EVENT_TO_DIRECTION: dict[EventsEnum, Direction] = {
     EventsEnum.UP: Direction.NORTH,
@@ -86,7 +85,7 @@ class GameEngine(Engine):
             self.won = True
             self.game_ended = True
             return
-        seed = random.randrange(2 ** 31)   # voir s'il faut pas mettre juste 0
+        seed = 0
         self._load_level(seed)
 
 #    PACMAN
