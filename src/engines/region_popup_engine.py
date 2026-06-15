@@ -29,3 +29,6 @@ class RegionPopupEngine(PopupEngine):
                     self.activate_current_hover(globalstate)
                 case EventsEnum.ESCAPE:
                     globalstate.to_remove = 1
+
+    def reset(self):
+        self.hover_on = 0

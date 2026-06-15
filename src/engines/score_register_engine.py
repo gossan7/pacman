@@ -6,7 +6,7 @@ from ..state import GlobalState
 from ..state import EngineFlag, EventsEnum
 
 
-MAX_NAME_LENGTH = 12
+MAX_NAME_LENGTH = 10
 
 
 class ScoreRegisterEngine(PopupEngine):

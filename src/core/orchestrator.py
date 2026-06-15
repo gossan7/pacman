@@ -66,6 +66,7 @@ class Orchestrator:
         for _ in range(min(self.global_state.to_remove,
                            len(self.global_state.engine_stack))):
             engine = self.global_state.engine_stack.pop()
+            self.engines[engine][0].reset()
             if engine in {
                 EngineFlag.PAUSE,
                 EngineFlag.CHEAT,
@@ -76,9 +77,6 @@ class Orchestrator:
                 self.global_state.popup -= 1
 
         self.global_state.to_remove = 0
-
-        if self.global_state.to_add == EngineFlag.GAME:
-            self.engines[EngineFlag.GAME][0].reset()
         if self.global_state.to_add is not None:
             self.global_state.engine_stack.append(self.global_state.to_add)
         if self.global_state.to_add in {
