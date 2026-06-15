@@ -47,7 +47,7 @@ class InputHandler:
                 elif isinstance(key, KeyCode) and key.char is not None:
                     if key in WASD:
                         self.formatted_inputs["direction"] = WASD[key]
-                    if key.char.isprintable():
+                    if key.char == " " or key.char.isalnum():
                         self.formatted_inputs["chars"] += key.char
 
         self.listener = Listener(

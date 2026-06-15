@@ -11,6 +11,8 @@ $(INSTALL_STAMP): $(PYPROJECT_TOML)
 	uv sync
 	@touch $(INSTALL_STAMP)
 
+all: run
+
 install: $(INSTALL_STAMP)
 
 run: $(INSTALL_STAMP)
@@ -28,4 +30,7 @@ clean:
 	@rm -rf .mypy_cache .venv
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
-.PHONY: install run debug clean lint
+fclean: clean
+	@rm -rf .venv
+
+.PHONY: all install run debug lint clean fclean

@@ -32,7 +32,9 @@ def load_scores(filename: str = "highSCORE.json") -> list[tuple[str, int]]:
 
 
 def init_window():
+    pyray.set_trace_log_level(pyray.TraceLogLevel.LOG_ERROR)
     pyray.init_window(1920, 1080, "Pacman")
+    pyray.hide_cursor()
     width = int(pyray.get_monitor_width(0) / 1.5)
     height = int(pyray.get_monitor_height(0) / 1.5)
     pyray.set_window_size(width, height)
@@ -50,4 +52,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"An error has occured during the program: {e}")

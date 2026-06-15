@@ -22,3 +22,6 @@ class Engine(ABC):
         self.update_always(globalstate)
         if globalstate.focus == self.flag:
             self.update_focus(globalstate)
+
+    def reset(self) -> None:
+        pass

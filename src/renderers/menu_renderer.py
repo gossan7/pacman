@@ -32,7 +32,8 @@ class MenuRenderer(Renderer):
         pyray.clear_background(pyray.BLACK)
 
         n = len(REGIONS)
-        content_height = GAME_NAME_SIZE + REGION_PADDING + n * (REGION_HEIGHT + REGION_PADDING)
+        content_height = GAME_NAME_SIZE + REGION_PADDING + \
+            n * (REGION_HEIGHT + REGION_PADDING)
         start_y = (WORLD_HEIGHT - content_height) // 2
 
         text_width = pyray.measure_text(GAME_NAME, to_screen(GAME_NAME_SIZE))
