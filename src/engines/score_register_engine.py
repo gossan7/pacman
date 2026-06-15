@@ -1,4 +1,5 @@
 from typing import Any
+import json
 
 from .popup_engine import PopupEngine
 from ..state import GlobalState
@@ -23,10 +24,21 @@ class ScoreRegisterEngine(PopupEngine):
 
     def _register(self, globalstate: GlobalState) -> None:
         globalstate.scores.append((self.name.strip() or "???", self.score))
-        globalstate.scores.sort(reverse=True)
+        globalstate.scores.sort(key=lambda x: x[1], reverse=True)
         while len(globalstate.scores) > 10:
             globalstate.scores.pop()
         self.name = ""
+
+        json_object = [
+            {"name": k, "score": v}
+            for k, v in globalstate.scores
+        ]
+
+        try:
+            with open(self.config["highscore_filename"], "+w") as f:
+                json.dump(json_object, f)
+        except Exception:
+            raise Exception("Error during score writing into HIGHSCORE file.")
 
     def _close(self, globalstate: GlobalState) -> None:
         globalstate.to_remove = len(globalstate.engine_stack)
