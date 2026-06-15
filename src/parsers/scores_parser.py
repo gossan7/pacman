@@ -41,4 +41,4 @@ class ScoreParser:
 
             res.append((name, score))
 
-        return res
+        return sorted(res, key=lambda x: x[1], reverse=True)
