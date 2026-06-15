@@ -23,3 +23,10 @@ class GlobalState:
         self.won: bool = False
         self.to_add_on_quit: EngineFlag | None = None
         self.popup: int = 0
+        self.cheats_state = {
+            "invincibility": False,
+            "win_level": False,
+            "ghost_freeze": False,
+            "extra_life": False,
+            "increased_speed": False
+        }
