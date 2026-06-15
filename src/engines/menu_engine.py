@@ -1,36 +1,21 @@
 from typing import Any
-from enum import Enum
 
 from .engine import Engine
 from ..state import GlobalState, EngineFlag, EventsEnum
 
 
-class MenuRegionEnum(Enum):
-    PLAY = 0,
-    SCORE = 1
-    OPTIONS = 2,
-    QUIT = 3
-
-
 REGIONS = [
-    MenuRegionEnum.PLAY,
-    MenuRegionEnum.SCORE,
-    MenuRegionEnum.OPTIONS,
-    MenuRegionEnum.QUIT
+    "PLAY",
+    "SCORES",
+    "CONTROLS",
+    "QUIT"
 ]
 
-REGIONS_STR = {
-    MenuRegionEnum.PLAY: "PLAY",
-    MenuRegionEnum.SCORE: "SCORES",
-    MenuRegionEnum.OPTIONS: "OPTIONS",
-    MenuRegionEnum.QUIT: "QUIT"
-}
-
 ACTIONS = {
-    MenuRegionEnum.PLAY: (EngineFlag.GAME, True),
-    MenuRegionEnum.SCORE: (EngineFlag.SCORE, False),
-    MenuRegionEnum.OPTIONS: (EngineFlag.OPTIONS, False),
-    MenuRegionEnum.QUIT: (EngineFlag.QUIT, False)
+    "PLAY": (EngineFlag.GAME, 1),
+    "SCORES": (EngineFlag.SCORES, 0),
+    "CONTROLS": (EngineFlag.CONTROLS, 0),
+    "QUIT": (EngineFlag.QUIT, 0)
 }
 
 
@@ -41,12 +26,13 @@ class MenuEngine(Engine):
         self.hover_on = 0
 
     def activate_current_hover(self, globalstate: GlobalState):
-        to_add, remove = ACTIONS[REGIONS[self.hover_on]]
-        globalstate.to_remove += 1 if remove else 0
-        globalstate.to_add = to_add
+        to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
+        globalstate.to_remove += to_remove
+        if to_add:
+            globalstate.to_add = to_add
 
     def update_always(self, globalstate: GlobalState) -> None:
-        pass
+        globalstate.to_add_on_quit = None
 
     def update_focus(self, globalstate: GlobalState) -> None:
         while globalstate.events:

@@ -25,17 +25,24 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
     return res
 
 
+def load_scores(filename: str = "highSCORE.json") -> list[tuple[str, int]]:
+    """hardcoded values to test, need to load from the json after"""
+    return []
+
+
 def init_window():
     pyray.init_window(1920, 1080, "Pacman")
     width = int(pyray.get_monitor_width(0) / 1.5)
     height = int(pyray.get_monitor_height(0) / 1.5)
     pyray.set_window_size(width, height)
+    pyray.set_exit_key(pyray.KeyboardKey.KEY_NULL)
 
 
 def main() -> None:
     config: dict[str, Any] = load_config()
+    scores = load_scores(config["highscore_filename"])
     init_window()
-    orchestrator = Orchestrator(config)
+    orchestrator = Orchestrator(config, scores)
     orchestrator.run()
     # orchestrator.run_test()
 

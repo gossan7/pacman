@@ -3,7 +3,12 @@ from .menu_engine import MenuEngine
 from .game_engine import GameEngine
 from .pause_engine import PauseEngine
 from .cheat_engine import CheatEngine
-from .score_engine import ScoreEngine
+from .scores_engine import ScoresEngine
+from .popup_engine import PopupEngine
+from .region_popup_engine import RegionPopupEngine
+from .quit_engine import QuitEngine
+from .controls_engine import ControlsEngine
+from .score_register_engine import ScoreRegisterEngine
 
 
 __all__ = [
@@ -12,5 +17,10 @@ __all__ = [
     "MenuEngine",
     "PauseEngine",
     "CheatEngine",
-    "ScoreEngine"
+    "ScoresEngine",
+    "ControlsEngine",
+    "PopupEngine",
+    "RegionPopupEngine",
+    "QuitEngine",
+    "ScoreRegisterEngine"
 ]
