@@ -2,12 +2,13 @@ from typing import Any
 import pyray
 
 from .core import Orchestrator
+from .parsers import ScoreParser, ConfigParser
 
 
 def load_config(filename: str = "config.json") -> dict[str, Any]:
     """hardcoded values to test, need to do a real parser after"""
     res: dict[str, Any] = {
-        "fps": 30,
+        "fps": 60,
         "seed": 42,
         "width": 10,
         "height": 10,
@@ -17,8 +18,8 @@ def load_config(filename: str = "config.json") -> dict[str, Any]:
         "ghost_val": 200,
         "level_max_time": 90,
         "frightened_duration": 7.0,
-        "pacman_speed": 15,
-        "ghost_speed": 7,
+        "pacman_speed": 10,
+        "ghost_speed": 6,
         "num_levels": 1,
         "highscore_filename": "highSCORE.json",
     }
@@ -39,12 +40,13 @@ def init_window():
 
 
 def main() -> None:
-    config: dict[str, Any] = load_config()
-    scores = load_scores(config["highscore_filename"])
+    scoreparser = ScoreParser()
+    configparser = ConfigParser()
+    config: dict[str, Any] = configparser.parse("config.json")
+    scores = scoreparser.parse(config["highscore_filename"])
     init_window()
     orchestrator = Orchestrator(config, scores)
     orchestrator.run()
-    # orchestrator.run_test()
 
 
 if __name__ == "__main__":

@@ -34,6 +34,7 @@ _FRIGHTENED_SPEED = 0.5
 
 
 class GameEngine(Engine):
+
     def __init__(self, config: dict[str, Any]) -> None:
         super().__init__(config)
         self.flag = EngineFlag.GAME
@@ -43,18 +44,19 @@ class GameEngine(Engine):
         self.ghost_speed: float = config["ghost_speed"]
         self.frightened_duration: float = config["frightened_duration"]
         self.hitbox_radius: float = 0.2
+        self.max_levels: int = config["num_levels"]
+        self.reset()
+
+    def reset(self) -> None:
         self.intro_remaining: float = 0.0
         self.outro_remaining: float = 0.0
         self.death_remaining: float = 0.0
-        self.lives: int = config["lives"]
+        self.lives: int = self.config["lives"]
         self.score: int = 0
         self.level: int = 1
-
         self.game_ended: bool = False
-        self.max_levels: int = config["num_levels"]
         self.won: bool = False
-
-        self._load_level(config["seed"])
+        self._load_level(self.config["seed"])
 
     def _load_level(self, seed: int) -> None:
         self.map = Map(

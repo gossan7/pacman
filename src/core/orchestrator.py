@@ -77,6 +77,8 @@ class Orchestrator:
 
         self.global_state.to_remove = 0
 
+        if self.global_state.to_add == EngineFlag.GAME:
+            self.engines[EngineFlag.GAME][0].reset()
         if self.global_state.to_add is not None:
             self.global_state.engine_stack.append(self.global_state.to_add)
         if self.global_state.to_add in {
@@ -114,41 +116,17 @@ class Orchestrator:
         pyray.end_drawing()
 
     def run(self) -> None:
-        # TEMPORARY : artificial loop to break at some point
-        # i = 0  # TEMPORARY
-
         self.input_handler.start()
         while self.global_state.running:
             self.window_handler.update(self.global_state)
             self.loop_start()
             for flag in self.global_state.engine_stack:
                 engine, renderer = self.engines[flag]
-                # to add: catch the switch fullscreen/window (add in the
-                # renderer or in another method)
+
                 engine.update(self.global_state)
                 renderer.render()
             self.loop_end()
             self.wait_frame_time()
             self.update_global_state()
-            # i += 1  # TEMPORARY
-            # print(i)  # TEMPORARY
-            # if i >= 10:  # TEMPORARY
-            # self.global_state.running = False  # TEMPORARY
-
-        self.input_handler.stop()
-
-    def run_test(self, max_iterations: int = 10) -> None:
-        """TO DELETE: to test the inputs if needed"""
-        import time
-        i = 0
-
-        self.input_handler.start()
-
-        while self.global_state.running and i < max_iterations:
-            while not any(self.input_handler.formatted_inputs.values()):
-                time.sleep(0.05)
-
-            print(self.input_handler.get_formatted_inputs())
-            i += 1
 
         self.input_handler.stop()
