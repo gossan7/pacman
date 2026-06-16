@@ -22,6 +22,7 @@ class Cell:
 
 
 class Map:
+    
     # Size of the 42 pattern in the middle
     _PATTERN_ROWS = 5
     _PATTERN_COLS = 7

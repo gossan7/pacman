@@ -32,3 +32,6 @@ class RegionPopupEngine(PopupEngine):
 
     def reset(self):
         self.hover_on = 0
+
+    def region_status(self, index: int) -> str | None:
+        return None

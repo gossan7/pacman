@@ -393,7 +393,6 @@ class GameEngine(Engine):
     def update_always(self, globalstate: GlobalState) -> None:
         if globalstate.cheats_state["extra_life"]:
             self.lives += 1
-            self.score += 100000
             globalstate.cheats_state["extra_life"] = False
         if globalstate.cheats_state["win_level"]:
             globalstate.cheats_state["win_level"] = False

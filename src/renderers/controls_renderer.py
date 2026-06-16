@@ -51,7 +51,8 @@ class ControlsRenderer(PopupRenderer):
             parts = [(f"{action} - ", pyray.WHITE)]
             if " | " in key:
                 left_key, right_key = key.split(" | ", 1)
-                parts += [(left_key, pyray.YELLOW), (" | ", pyray.WHITE), (right_key, pyray.YELLOW)]
+                parts += [(left_key, pyray.YELLOW),
+                          (" | ", pyray.WHITE), (right_key, pyray.YELLOW)]
             else:
                 parts.append((key, pyray.YELLOW))
             for segment, color in parts:
