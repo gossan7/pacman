@@ -44,7 +44,15 @@ class GameEngine(Engine):
         self.frightened_duration: float = config["frightened_duration"]
         self.hitbox_radius: float = 0.2
         self.max_levels: int = config["num_levels"]
-        self.reset()
+        self.intro_remaining: float = 0.0
+        self.outro_remaining: float = 0.0
+        self.death_remaining: float = 0.0
+        self.lives: int = self.config["lives"]
+        self.score: int = 0
+        self.level: int = 1
+        self.game_ended: bool = False
+        self.won: bool = False
+        self._load_level(self.config["seed"])
 
     def reset(self) -> None:
         self.intro_remaining: float = 0.0
@@ -374,8 +382,6 @@ class GameEngine(Engine):
             self._on_timeout()
 
     def _on_timeout(self) -> None:
-        # faudra qu'on décide: game over ou restart le level ?
-        # je mets game over pour l'instant ca semble mieux
         self.game_ended = True
 
     def _end_game(self, globalstate: GlobalState) -> None:
@@ -385,7 +391,15 @@ class GameEngine(Engine):
         globalstate.focus = EngineFlag.SCORE_REGISTER
 
     def update_always(self, globalstate: GlobalState) -> None:
-        pass
+        if globalstate.cheats_state["extra_life"]:
+            self.lives += 1
+            self.score += 100000
+            globalstate.cheats_state["extra_life"] = False
+        if globalstate.cheats_state["win_level"]:
+            globalstate.cheats_state["win_level"] = False
+            self._advance_level()
+        if self.game_ended:
+            self._end_game(globalstate)
 
     def update_focus(self, globalstate: GlobalState) -> None:
         self._read_input(globalstate)
@@ -404,7 +418,8 @@ class GameEngine(Engine):
         self._tick_ghost_states(globalstate.delta_time)
 
         # PACMAN
-        self.pacman_progress += self.pacman_speed
+        self.pacman_progress += self.pacman_speed * \
+            (1 if not globalstate.cheats_state["increased_speed"] else 1.5)
         while self.pacman_progress >= _STEP_COST and not self.game_ended:
             if self._step_pacman():
                 self.pacman_progress -= _STEP_COST
@@ -413,15 +428,15 @@ class GameEngine(Engine):
                 break
 
         # GHOSTS
-        self.ghost_progress += self._current_ghost_speed()
-        while self.ghost_progress >= _STEP_COST and not self.game_ended:
-            self.ghost_progress -= _STEP_COST
-            self._step_ghosts()
+        if not globalstate.cheats_state["ghost_freeze"]:
+            self.ghost_progress += self._current_ghost_speed()
+            while self.ghost_progress >= _STEP_COST and not self.game_ended:
+                self.ghost_progress -= _STEP_COST
+                self._step_ghosts()
 
         # EVENTS
         if self.pacman_progress >= _EAT_AT:
             self._eat(self.pacman.position)
-        if not self.game_ended:
+        if (not self.game_ended
+                and not globalstate.cheats_state["invincibility"]):
             self._check_collisions()
-        if self.game_ended:
-            self._end_game(globalstate)

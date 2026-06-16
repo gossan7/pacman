@@ -9,7 +9,6 @@ class GlobalState:
         self.focus: EngineFlag = EngineFlag.MENU
         self.scores: list[tuple[str, int]] = scores if scores is not None \
             else []
-        self.cheat_enabled: bool = False
         self.delta_time: float = 0.0
         self.running: bool = True
         self.events: list[EventsEnum] = []
