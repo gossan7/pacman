@@ -21,6 +21,8 @@ TEXT_TO_DISPLAY = "PAUSE"
 
 KONAMI_CODE = [
     EventsEnum.UP,
+    EventsEnum.UP,
+    EventsEnum.DOWN,
     EventsEnum.DOWN,
     EventsEnum.LEFT,
     EventsEnum.RIGHT,
