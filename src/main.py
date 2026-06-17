@@ -18,7 +18,7 @@ def init_window():
 def main() -> None:
     scoreparser = ScoreParser()
     configparser = ConfigParser()
-    config: dict[str, Any] = configparser.parse("config.json")
+    config: dict[str, Any] = configparser.parse("config")
     scores = scoreparser.parse(config["highscore_filename"])
     init_window()
     orchestrator = Orchestrator(config, scores)

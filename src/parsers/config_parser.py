@@ -5,7 +5,6 @@ _CONFIG_CONTENT = {
     "fps": int,
     "seed": int,
     "width": int,
-    "length": int,
     "height": int,
     "lives": int,
     "gum_val": int,
@@ -23,7 +22,6 @@ _DEFAULT_CONFIG = {
     "fps": 60,
     "seed": 42,
     "width": 10,
-    "length": 10,
     "height": 10,
     "lives": 3,
     "gum_val": 10,
@@ -40,86 +38,92 @@ _DEFAULT_CONFIG = {
 
 class ConfigParser:
 
+    @staticmethod
+    def _strip_comments(text: str) -> str:
+        lines = []
+        for line in text.splitlines():
+            if line.lstrip().startswith("#"):
+                continue
+            lines.append(line)
+        return "\n".join(lines)
+
+    @staticmethod
+    def _writable(path: str) -> bool:
+        try:
+            with open(path, 'a', encoding='utf-8'):
+                pass
+        except (OSError, ValueError):
+            return False
+        return True
+
+    @staticmethod
+    def _valid_value(key: str, value: Any) -> bool:
+        if key == "fps":
+            return 30 <= value <= 60
+        if key in ("width", "height"):
+            return 200 >= value >= 10
+        if key in ("lives", "num_levels", "level_max_time",
+                   "pacman_speed", "ghost_speed"):
+            return value > 0
+        if key in ("gum_val", "supergum_val", "ghost_val"):
+            return value >= 0
+        if key == "frightened_duration":
+            return value > 0.0
+        if key == "highscore_filename":
+            return ConfigParser._writable(value)
+        return True
+
     def parse(self, filename: str) -> dict[str, Any]:
-        res: dict[str, Any] = {}
+        res: dict[str, Any] = dict(_DEFAULT_CONFIG)
 
         try:
             with open(filename, 'r', encoding='utf-8') as f:
-                content = json.load(f)
+                raw = f.read()
         except FileNotFoundError:
             print(f"Warning: Config file '{filename}' not found. "
                   f"Using default config.")
-            return _DEFAULT_CONFIG.copy()
-        except json.JSONDecodeError as e:
-            print(f"Warning: Config file '{filename}' is not valid JSON: {e}. "
-                  f"Using default config.")
-            return _DEFAULT_CONFIG.copy()
+            return res
         except Exception as e:
             print(f"Warning: Could not read config file '{filename}': {e}. "
                   f"Using default config.")
-            return _DEFAULT_CONFIG.copy()
+            return res
+
+        try:
+            content = json.loads(self._strip_comments(raw))
+        except (ValueError, RecursionError) as e:
+            print(f"Warning: Config file '{filename}' is not valid JSON: {e}. "
+                  f"Using default config.")
+            return res
 
         if not isinstance(content, dict):
             print("Warning: Config must be a JSON object (dict). "
                   "Using default config.")
-            return _DEFAULT_CONFIG.copy()
+            return res
+
+        for key in _CONFIG_CONTENT:
+            if key not in content:
+                print(f"Warning: missing config key '{key}'; "
+                      f"using default {_DEFAULT_CONFIG[key]}.")
 
         for key, value in content.items():
-
             if key not in _CONFIG_CONTENT:
-                raise ValueError(f"Key '{key}' is not a valid argument")
+                print(f"Warning: unknown config key '{key}' ignored.")
+                continue
 
-            if not isinstance(value, _CONFIG_CONTENT[key]):
-                raise ValueError(
-                    f"Key '{key}' must be {_CONFIG_CONTENT[key].__name__}, "
-                    f"got {type(value).__name__}"
-                )
+            expected = _CONFIG_CONTENT[key]
+            if expected is float and isinstance(value, int) \
+                    and not isinstance(value, bool):
+                value = float(value)
 
-            if key in res:
-                raise ValueError(f"Key '{key}' is set more than once")
+            if isinstance(value, bool) or not isinstance(value, expected):
+                print(f"Warning: '{key}' must be {expected.__name__}; "
+                      f"keeping default {_DEFAULT_CONFIG[key]}.")
+                continue
 
-            if key == "fps":
-                if not 30 <= value <= 60:
-                    raise ValueError("FPS must be between 30 and 60")
-
-            elif key in ["width", "length"]:
-                if value < 10:
-                    raise ValueError(
-                        f"{key.capitalize()} must be at least 10")
-
-            elif key == "height":
-                if value < 10:
-                    raise ValueError("Height must be at least 10")
-
-            elif key == "lives":
-                if value <= 0:
-                    raise ValueError("Must have at least 1 life")
-
-            elif key == "level_max_time":
-                if value <= 0:
-                    raise ValueError("Max level time must be greater than 0")
-
-            elif key == "frightened_duration":
-                if value <= 0.0:
-                    raise ValueError(
-                        "Frightened duration must be greater than 0")
-
-            elif key in ["pacman_speed", "ghost_speed"]:
-                if value <= 0:
-                    raise ValueError(
-                        f"{key} must be greater than 0")
-
-            elif key == "num_levels":
-                if value <= 0:
-                    raise ValueError("Must have at least 1 level")
-
-            elif key == "highscore_filename":
-                try:
-                    with open(value, 'a', encoding='utf-8') as f:
-                        pass
-                except (OSError, PermissionError) as e:
-                    raise ValueError(
-                        f"Cannot write to '{value}': {e}")
+            if not self._valid_value(key, value):
+                print(f"Warning: invalid value for '{key}' ({value}); "
+                      f"keeping default {_DEFAULT_CONFIG[key]}.")
+                continue
 
             res[key] = value
 

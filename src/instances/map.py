@@ -77,9 +77,6 @@ class Map:
             return None
         if (row, col) in self._corners:
             return SuperGum(self._supergum_val)
-        if (self.middle[0] - 2 < row < self.middle[0] + 2 or
-                self.middle[1] - 3 < col < self.middle[1] + 3):
-            return None
         return Gum(self._gum_val)
 
     def open_directions(self, position: Vec2) -> list[Direction]:

@@ -1,8 +1,8 @@
 {
 	"fps": 60,
 	"seed": 42,
-	"width": 10,
-	"height": 10,
+	"width": 11,
+	"height": 11,
 	"lives": 3,
 	"gum_val": 10,
 	"supergum_val": 50,
@@ -10,6 +10,7 @@
 	"level_max_time": 90,
 	"frightened_duration": 7.0,
 	"pacman_speed": 8,
+	#test
 	"ghost_speed": 6,
 	"num_levels": 2,
 	"highscore_filename": "highSCORE.json"
