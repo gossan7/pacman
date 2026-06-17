@@ -306,11 +306,19 @@ class GameRenderer(Renderer):
         # HUD
         font = to_screen(HUD_FONT)
         engine = self.engine
+        if engine.level_remaining < 1000:
+            time_displayed = f"{max(0, round(engine.level_remaining, 2))}"
+        else:
+            time_displayed = "999+"
+        if min(engine.level, engine.max_levels) < 999:
+            lvl_displayed = f"{min(engine.level, engine.max_levels)}"
+        else:
+            lvl_displayed = "99+"
         items = [
-            f"SCORE {engine.score}",
-            f"LEVEL {engine.level}",
-            f"LIVES {engine.lives}",
-            f"TIME {max(0, int(engine.level_remaining))}",
+            f"SCORE {engine.score if engine.score < 1000000 else '999999+'}",
+            f"LEVEL {lvl_displayed}",
+            f"LIVES {engine.lives if engine.lives < 99 else '99+'}",
+            f"TIME {time_displayed}",
         ]
         colw = (WORLD_WIDTH - 2 * MARGIN) // len(items)
         hy = to_screen(MARGIN)

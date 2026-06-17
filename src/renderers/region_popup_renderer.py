@@ -12,10 +12,14 @@ TEXT_POPUP_GAP = 20
 POPUP_WIDTH = WORLD_WIDTH // 2
 POPUP_HEIGHT = WORLD_HEIGHT // 2
 POPUP_PADDING = 20
-REGION_HEIGHT = 50
+REGION_HEIGHT = 45
 REGION_PADDING = 10
-FONT_SIZE = 20
+FONT_SIZE = 15
 OUTER_LINE_SIZE = 5
+
+TOGGLE_WIDTH = 40
+TOGGLE_HEIGHT = 20
+TOGGLE_PAD = 3
 
 
 class RegionPopupRenderer(PopupRenderer):
@@ -29,6 +33,21 @@ class RegionPopupRenderer(PopupRenderer):
         self.config = config
         self.engine: RegionPopupEngine = engine
         self.window_handler = window_handler
+
+    def _draw_toggle(
+            self, rx: int, ry: int, rw: int, rh: int, on: bool) -> None:
+        to_screen = self.window_handler.to_screen
+        sw = to_screen(TOGGLE_WIDTH)
+        sh = to_screen(TOGGLE_HEIGHT)
+        sx = rx + rw - to_screen(REGION_PADDING) - sw
+        sy = ry + (rh - sh) // 2
+        rec = pyray.Rectangle(sx, sy, sw, sh)
+        track = pyray.GREEN if on else pyray.RED
+        pyray.draw_rectangle_rounded(rec, 1.0, 12, track)
+        radius = sh / 2 - to_screen(TOGGLE_PAD)
+        cy = sy + sh // 2
+        cx = sx + sw - sh // 2 if on else sx + sh // 2
+        pyray.draw_circle(cx, cy, radius, pyray.RAYWHITE)
 
     def render(self) -> None:
         super().render()
@@ -103,3 +122,9 @@ class RegionPopupRenderer(PopupRenderer):
                     font_size,
                     pyray.BLACK
                 )
+            status = self.engine.region_status(i)
+            if status is not None:
+                self._draw_toggle(
+                    rect_screen_x, rect_screen_y,
+                    rect_screen_width, rect_screen_height,
+                    status == "ON")

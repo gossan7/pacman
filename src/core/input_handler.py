@@ -52,7 +52,7 @@ class InputHandler:
 
         self.listener = Listener(
             on_press=on_press,
-            suppress=False  # TEMP
+            suppress=False
         )
 
         self.formatted_inputs: dict = {

@@ -5,40 +5,60 @@ from pathlib import Path
 class ScoreParser:
 
     def parse(self, filename: str) -> list[tuple[str, int]]:
-        res = []
-
         try:
             with open(filename, 'r', encoding='utf-8') as f:
-                content = json.load(f)
+                raw = f.read()
         except FileNotFoundError:
             print(f"Info: Scores file '{filename}' not found. Creating it.")
-            Path(filename).touch()
+            try:
+                Path(filename).touch()
+            except OSError as e:
+                print(f"Warning: could not create '{filename}': {e}")
             return []
         except Exception as e:
-            raise Exception(f"Could not open {filename}: {e}")
+            print(f"Warning: could not read '{filename}': {e}")
+            return []
+
+        if not raw.strip():
+            return []
+
+        try:
+            content = json.loads(raw)
+        except (ValueError, RecursionError) as e:
+            print(f"Warning: '{filename}' is not valid JSON: {e}. "
+                  f"Ignoring scores.")
+            return []
 
         if not isinstance(content, list):
-            raise ValueError("Scores must be a JSON list")
+            print(f"Warning: '{filename}' must be a JSON list. "
+                  f"Ignoring scores.")
+            return []
 
+        res: list[tuple[str, int]] = []
         for item in content:
-            if not isinstance(item, dict):
-                raise ValueError("Each score must be a JSON object")
+            entry = self._parse_entry(item)
+            if entry is not None:
+                res.append(entry)
 
-            if "name" not in item or "score" not in item:
-                raise ValueError("Each score must have 'name' and 'score'")
+        res.sort(key=lambda x: x[1], reverse=True)
+        return res[:10]
 
-            name = item["name"]
-            score = item["score"]
+    def _valid_name(self, name: str) -> bool:
+        if not 1 <= len(name) <= 10:
+            return False
+        if not name.strip():
+            return False
+        return all(c.isalnum() or c == ' ' for c in name)
 
-            if not isinstance(name, str):
-                raise ValueError(
-                    f"Name must be string, got {type(name).__name__}")
-            if not name.strip():
-                raise ValueError("Name must not be empty")
-            if not isinstance(score, int):
-                raise ValueError(
-                    f"Score must be int, got {type(score).__name__}")
-
-            res.append((name, score))
-
-        return sorted(res, key=lambda x: x[1], reverse=True)
+    def _parse_entry(self, item: object) -> tuple[str, int] | None:
+        if not isinstance(item, dict):
+            return None
+        name = item.get("name")
+        score = item.get("score")
+        if not isinstance(name, str) or not self._valid_name(name):
+            return None
+        if not isinstance(score, int) or isinstance(score, bool):
+            return None
+        if score < 0:
+            return None
+        return (name, score)
