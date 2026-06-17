@@ -16,10 +16,11 @@ REGION_HEIGHT = 45
 REGION_PADDING = 10
 FONT_SIZE = 15
 OUTER_LINE_SIZE = 5
+TOGGLE_OUTER_LINE = 2
 
 TOGGLE_WIDTH = 40
 TOGGLE_HEIGHT = 20
-TOGGLE_PAD = 3
+TOGGLE_PAD = 5
 
 
 class RegionPopupRenderer(PopupRenderer):
@@ -35,19 +36,47 @@ class RegionPopupRenderer(PopupRenderer):
         self.window_handler = window_handler
 
     def _draw_toggle(
-            self, rx: int, ry: int, rw: int, rh: int, on: bool) -> None:
+            self,
+            rx: int,
+            ry: int,
+            rw: int,
+            rh: int,
+            on: bool,
+            hover_on: bool
+    ) -> None:
         to_screen = self.window_handler.to_screen
         sw = to_screen(TOGGLE_WIDTH)
         sh = to_screen(TOGGLE_HEIGHT)
         sx = rx + rw - to_screen(REGION_PADDING) - sw
         sy = ry + (rh - sh) // 2
-        rec = pyray.Rectangle(sx, sy, sw, sh)
-        track = pyray.GREEN if on else pyray.RED
-        pyray.draw_rectangle_rounded(rec, 1.0, 12, track)
-        radius = sh / 2 - to_screen(TOGGLE_PAD)
-        cy = sy + sh // 2
-        cx = sx + sw - sh // 2 if on else sx + sh // 2
-        pyray.draw_circle(cx, cy, radius, pyray.RAYWHITE)
+
+        outer_color = pyray.BLACK if hover_on else pyray.WHITE
+        inner_color = pyray.WHITE if hover_on else pyray.BLACK
+
+        pyray.draw_rectangle(sx, sy, sw, sh, outer_color)
+        decay = to_screen(TOGGLE_OUTER_LINE)
+
+        pyray.draw_rectangle(
+            sx + decay,
+            sy + decay,
+            sw - decay * 2,
+            sh - decay * 2,
+            inner_color
+        )
+
+        tsize = sh - to_screen(TOGGLE_PAD) * 2
+        ty = sy + to_screen(TOGGLE_PAD)
+        tx = sx + sw - tsize - to_screen(TOGGLE_PAD) if on \
+            else sx + to_screen(TOGGLE_PAD)
+
+        if hover_on:
+            track = pyray.BLACK
+        elif on:
+            track = pyray.YELLOW
+        else:
+            track = pyray.WHITE
+
+        pyray.draw_rectangle(tx, ty, tsize, tsize, track)
 
     def render(self) -> None:
         super().render()
@@ -127,4 +156,6 @@ class RegionPopupRenderer(PopupRenderer):
                 self._draw_toggle(
                     rect_screen_x, rect_screen_y,
                     rect_screen_width, rect_screen_height,
-                    status == "ON")
+                    status == "ON",
+                    self.engine.hover_on == i
+                )
