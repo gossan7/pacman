@@ -47,6 +47,7 @@ class GameEngine(Engine):
         self.intro_remaining: float = 0.0
         self.outro_remaining: float = 0.0
         self.death_remaining: float = 0.0
+        self.end_game_done: bool = False
         self.lives: int = self.config["lives"]
         self.score: int = 0
         self.level: int = 1
@@ -58,6 +59,7 @@ class GameEngine(Engine):
         self.intro_remaining: float = 0.0
         self.outro_remaining: float = 0.0
         self.death_remaining: float = 0.0
+        self.end_game_done: bool = False
         self.lives: int = self.config["lives"]
         self.score: int = 0
         self.level: int = 1
@@ -385,6 +387,9 @@ class GameEngine(Engine):
         self.game_ended = True
 
     def _end_game(self, globalstate: GlobalState) -> None:
+        if self.end_game_done:
+            return
+        self.end_game_done = True
         globalstate.score = self.score
         globalstate.won = self.won
         globalstate.to_add = EngineFlag.SCORE_REGISTER
@@ -439,3 +444,6 @@ class GameEngine(Engine):
         if (not self.game_ended
                 and not globalstate.cheats_state["invincibility"]):
             self._check_collisions()
+
+        if self.game_ended:
+            self._end_game(globalstate)
