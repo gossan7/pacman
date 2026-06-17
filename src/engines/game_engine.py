@@ -385,6 +385,7 @@ class GameEngine(Engine):
         self.game_ended = True
 
     def _end_game(self, globalstate: GlobalState) -> None:
+
         globalstate.score = self.score
         globalstate.won = self.won
         globalstate.to_add = EngineFlag.SCORE_REGISTER
@@ -397,10 +398,10 @@ class GameEngine(Engine):
         if globalstate.cheats_state["win_level"]:
             globalstate.cheats_state["win_level"] = False
             self._advance_level()
-        if self.game_ended:
-            self._end_game(globalstate)
 
     def update_focus(self, globalstate: GlobalState) -> None:
+        if self.game_ended:
+            self._end_game(globalstate)
         self._read_input(globalstate)
         if self._tick_death(globalstate.delta_time):
             if self.game_ended:
