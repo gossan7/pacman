@@ -63,12 +63,29 @@ _TURNS = ({"U", "D"}, {"L", "R"})
 
 
 class GameRenderer(Renderer):
+    """
+    Draws the gameplay screen: maze, gums, Pac-Man, ghosts and HUD.
+
+    Loads the sprite sheets once, caches the maze walls into a render
+    texture (rebuilt only when the level or window size changes) and
+    animates the sprites using a frame counter. Reads all positions and
+    state from the game engine.
+    """
+
     def __init__(
             self,
             config: dict[str, Any],
             engine: GameEngine,
             window_handler: WindowHandler
     ) -> None:
+        """
+        Load the sprite sheets and initialise the render caches.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The game engine whose state is drawn.
+            window_handler: Helper for world-to-screen scaling.
+        """
         self.config = config
         self.engine: GameEngine = engine
         self.window_handler = window_handler
@@ -80,6 +97,15 @@ class GameRenderer(Renderer):
         self._tex_dimensions: tuple[int, int] | None = None
 
     def _load_sheet(self, path: str) -> pyray.Texture:
+        """
+        Load a sprite sheet, keying out black and using point filtering.
+
+        Args:
+            path: Path to the sprite sheet image.
+
+        Returns:
+            The loaded texture, ready for crisp pixel-art scaling.
+        """
         img = pyray.load_image(path)
         pyray.image_color_replace(img, pyray.BLACK, pyray.BLANK)
         tex = pyray.load_texture_from_image(img)
@@ -88,6 +114,9 @@ class GameRenderer(Renderer):
         return tex
 
     def unload(self) -> None:
+        """
+        Free the sprite sheets and the cached maze render texture.
+        """
         pyray.unload_texture(self.pac_sheet)
         pyray.unload_texture(self.ghost_sheet)
         if self._maze_tex is not None:
@@ -96,12 +125,38 @@ class GameRenderer(Renderer):
     # MAP CREATORS
 
     def _wall(self, r: int, c: int, bit: Direction) -> bool:
+        """
+        Tell whether a cell has a wall on a given side.
+
+        Args:
+            r: Cell row.
+            c: Cell column.
+            bit: The wall direction bit to test.
+
+        Returns:
+            True if the cell exists and has that wall; False if the cell is
+            out of bounds.
+        """
         m = self.engine.map
         if r < 0 or c < 0 or r >= m.height or c >= m.width:
             return False
         return bool(m.game_map[r][c].walls & bit)
 
     def _segments(self, vr: int, vc: int) -> set:
+        """
+        Find which wall segments meet at a maze vertex.
+
+        Vertices sit at the corners between cells; a segment indicates a
+        wall running up, down, left or right of the vertex.
+
+        Args:
+            vr: Vertex row.
+            vc: Vertex column.
+
+        Returns:
+            A subset of {"U", "D", "L", "R"} for the walls touching the
+            vertex.
+        """
         seg = set()
         if self._wall(vr - 1, vc, Direction.WEST) \
                 or self._wall(vr - 1, vc - 1, Direction.EAST):
@@ -118,10 +173,34 @@ class GameRenderer(Renderer):
         return seg
 
     def _is_turn(self, vr: int, vc: int) -> bool:
+        """
+        Tell whether a vertex is a corner (an elbow joining two walls).
+
+        Args:
+            vr: Vertex row.
+            vc: Vertex column.
+
+        Returns:
+            True when exactly two perpendicular segments meet, so the
+            walls should be joined by a rounded corner.
+        """
         seg = self._segments(vr, vc)
         return len(seg) == 2 and seg not in _TURNS
 
     def _create_walls(self, cell: int, thick: int, ox: int, oy: int) -> None:
+        """
+        Render the whole maze outline into the cached wall texture.
+
+        Draws horizontal and vertical wall segments (shortened at corners)
+        and the rounded vertices, so the maze can later be blitted in a
+        single draw call.
+
+        Args:
+            cell: Cell size in world units.
+            thick: Wall line thickness in world units.
+            ox: Horizontal offset of the maze in world units.
+            oy: Vertical offset of the maze in world units.
+        """
         s = self.window_handler.to_ratio
         r = max(thick, cell / 3)
         sr, st = s(r), s(thick)
@@ -157,6 +236,21 @@ class GameRenderer(Renderer):
 
     def _create_vertex(self, vr: int, vc: int, cell: int,
                        ox: int, oy: int, sr: int, st: int) -> None:
+        """
+        Draw the rounded corner arc at a single maze vertex.
+
+        Only corner vertices (two perpendicular segments) produce an arc;
+        the quadrant is chosen from which segments are present.
+
+        Args:
+            vr: Vertex row.
+            vc: Vertex column.
+            cell: Cell size in world units.
+            ox: Horizontal maze offset in world units.
+            oy: Vertical maze offset in world units.
+            sr: Corner radius in screen pixels.
+            st: Wall thickness in screen pixels.
+        """
         s = self.window_handler.to_ratio
         seg = self._segments(vr, vc)
         if not seg:
@@ -183,6 +277,21 @@ class GameRenderer(Renderer):
             self, sheet: pyray.Texture, col: int, row: int,
             cx: int, cy: int, size: int,
             tint: pyray.Color | None = None) -> None:
+        """
+        Draw one cell of a sprite sheet centred at a screen position.
+
+        A small inset is applied to the source rectangle to avoid bleeding
+        from neighbouring frames.
+
+        Args:
+            sheet: The sprite sheet texture.
+            col: Sprite column index in the sheet.
+            row: Sprite row index in the sheet.
+            cx: Screen x of the sprite centre.
+            cy: Screen y of the sprite centre.
+            size: Rendered sprite size in screen pixels.
+            tint: Optional tint colour (defaults to white/no tint).
+        """
         if tint is None:
             tint = pyray.WHITE
         inset = 0.05
@@ -196,6 +305,19 @@ class GameRenderer(Renderer):
         pyray.draw_texture_pro(sheet, src, dst, origin, 0.0, tint)
 
     def _ghost_row(self, ghost: Ghost) -> int:
+        """
+        Pick the sprite-sheet row for a ghost's current appearance.
+
+        Edible ghosts use the frightened row, flashing near the end of
+        frightened mode; otherwise the row is chosen from the ghost's kind
+        and facing direction.
+
+        Args:
+            ghost: The ghost being drawn.
+
+        Returns:
+            The sprite-sheet row index to use.
+        """
         if ghost.is_edible:
             if (self.engine.frightened_remaining < FLASH_AT
                     and (self.frame // 6) % 2 == 0):
@@ -204,6 +326,18 @@ class GameRenderer(Renderer):
         return GHOST_BASE_ROW[ghost.kind] + DIR_OFFSET.get(ghost.direction, 0)
 
     def _eyes_frame(self, ghost: Ghost) -> tuple[int, int]:
+        """
+        Pick the eyes sprite frame for a ghost travelling back to spawn.
+
+        The eyes face the dominant axis of travel from where the ghost was
+        eaten towards its spawn.
+
+        Args:
+            ghost: The ghost in eyes mode.
+
+        Returns:
+            The (column, row) of the eyes frame in the ghost sheet.
+        """
         dr = ghost.spawn.row - ghost.eyes_from.row
         dc = ghost.spawn.col - ghost.eyes_from.col
         if abs(dr) >= abs(dc):
@@ -215,6 +349,14 @@ class GameRenderer(Renderer):
     # RENDER
 
     def render(self) -> None:
+        """
+        Draw a full game frame.
+
+        Recomputes the cell layout, refreshes the cached wall texture when
+        needed, then draws the maze, gums, Pac-Man (including the death
+        animation), the ghosts, the HUD and any intro/outro banner, and
+        finally advances the animation frame counter.
+        """
         to_screen = self.window_handler.to_screen
         pyray.clear_background(pyray.BLACK)
 

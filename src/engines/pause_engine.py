@@ -32,7 +32,20 @@ KONAMI_CODE = [
 
 
 class PauseEngine(RegionPopupEngine):
+    """
+    Pause menu shown over the game.
+
+    Offers Resume / Controls / Quit, and listens for the Konami code on the
+    direction keys to open the cheat menu.
+    """
+
     def __init__(self, config):
+        """
+        Initialise the pause menu and the Konami input buffer.
+
+        Args:
+            config: Validated configuration dict.
+        """
         super().__init__(config)
         self.flag = EngineFlag.PAUSE
         self.regions = REGIONS
@@ -40,6 +53,12 @@ class PauseEngine(RegionPopupEngine):
         self.current_input_seq = deque()
 
     def activate_current_hover(self, globalstate: GlobalState) -> None:
+        """
+        Apply the action bound to the highlighted pause entry.
+
+        Args:
+            globalstate: The shared mutable game state.
+        """
         to_add, to_remove = ACTIONS[REGIONS[self.hover_on]]
         if REGIONS[self.hover_on] == "QUIT":
             globalstate.to_add_on_quit = EngineFlag.MENU
@@ -48,6 +67,15 @@ class PauseEngine(RegionPopupEngine):
             globalstate.to_add = to_add
 
     def handle_konami(self, event: EventsEnum):
+        """
+        Feed a direction event to the Konami code detector.
+
+        Args:
+            event: The latest direction event.
+
+        Returns:
+            True if the buffered sequence now matches the Konami code.
+        """
         self.current_input_seq.append(event)
         while len(self.current_input_seq) > len(KONAMI_CODE):
             self.current_input_seq.popleft()
@@ -56,6 +84,12 @@ class PauseEngine(RegionPopupEngine):
         return False
 
     def update_focus(self, globalstate: GlobalState) -> None:
+        """
+        Handle pause navigation, selection and the Konami code.
+
+        Args:
+            globalstate: The shared mutable game state.
+        """
         self.popup = globalstate.popup
         while globalstate.events:
             event = globalstate.events.pop()

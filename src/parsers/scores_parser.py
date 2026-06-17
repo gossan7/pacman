@@ -3,8 +3,25 @@ from pathlib import Path
 
 
 class ScoreParser:
+    """
+    Loads the persistent highscore table from a JSON file.
+
+    Invalid entries are skipped, the result is sorted by descending score
+    and capped at the top ten. A missing file is created and treated as an
+    empty table rather than an error.
+    """
 
     def parse(self, filename: str) -> list[tuple[str, int]]:
+        """
+        Read and sanitise the highscore file.
+
+        Args:
+            filename: Path to the JSON scores file.
+
+        Returns:
+            Up to ten (name, score) tuples sorted by descending score; an
+            empty list if the file is missing, empty or invalid.
+        """
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 raw = f.read()
@@ -44,6 +61,16 @@ class ScoreParser:
         return res[:10]
 
     def _valid_name(self, name: str) -> bool:
+        """
+        Check that a highscore name is acceptable.
+
+        Args:
+            name: The candidate player name.
+
+        Returns:
+            True if the name is 1-10 non-blank alphanumeric (or space)
+            characters.
+        """
         if not 1 <= len(name) <= 10:
             return False
         if not name.strip():
@@ -51,6 +78,16 @@ class ScoreParser:
         return all(c.isalnum() or c == ' ' for c in name)
 
     def _parse_entry(self, item: object) -> tuple[str, int] | None:
+        """
+        Validate and convert a single raw scores entry.
+
+        Args:
+            item: A decoded JSON element, expected to be a dict with
+                ``name`` and ``score`` fields.
+
+        Returns:
+            A (name, score) tuple if the entry is valid, otherwise None.
+        """
         if not isinstance(item, dict):
             return None
         name = item.get("name")

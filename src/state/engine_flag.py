@@ -2,6 +2,13 @@ from enum import IntFlag
 
 
 class EngineFlag(IntFlag):
+    """
+    Identifies each engine/screen so it can be tracked on the engine stack.
+
+    The orchestrator uses these values to decide which engine currently has
+    focus and which one should be pushed onto or popped from the stack.
+    """
+
     NONE = 0
     MENU = 1
     GAME = 2

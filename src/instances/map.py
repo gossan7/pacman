@@ -12,17 +12,39 @@ _DELTA: dict[Direction, Vec2] = {
 
 
 class Cell:
+    """
+    A single maze cell holding its walls and optional content.
+
+    Attributes:
+        walls: Wall bitmask (1: north, 2: east, 4: south, 8: west).
+        content: The gum or super-gum sitting on the cell, or None.
+    """
+
     def __init__(
             self,
             walls: int,
             content: Gum | SuperGum | None
     ) -> None:
+        """
+        Create a cell.
+
+        Args:
+            walls: Wall bitmask for this cell.
+            content: Gum, SuperGum or None placed on the cell.
+        """
         self.walls: int = walls
         self.content = content
 
 
 class Map:
-    
+    """
+    The playable maze built from an external maze generator.
+
+    Wraps a generated maze in a grid of Cell objects, places gums on every
+    walkable cell and super-gums in the four corners, and exposes movement
+    helpers based on the per-cell wall bitmasks.
+    """
+
     # Size of the 42 pattern in the middle
     _PATTERN_ROWS = 5
     _PATTERN_COLS = 7
@@ -35,10 +57,20 @@ class Map:
             height: int = 20,
             seed: int = 0
     ) -> None:
-        """Inits a maze then use it as a map
-        Each cell has walls encoded on 4 bits so we can do
-        bitwise operations with directions. Also inits supergums on the corners
-        and gums everywhere"""
+        """
+        Build a maze and populate it with gums.
+
+        Each cell stores its walls on 4 bits so directions and walls can be
+        combined with bitwise operations. Super-gums are placed on the four
+        corners and regular gums on every other walkable cell.
+
+        Args:
+            gum_val: Points awarded by a regular gum.
+            supergum_val: Points awarded by a super-gum.
+            width: Maze width in cells.
+            height: Maze height in cells.
+            seed: Seed forwarded to the maze generator for reproducibility.
+        """
 
         self._mazegen: MazeGenerator = MazeGenerator(
             size=(width, height), perfect=False, seed=seed)
@@ -73,6 +105,18 @@ class Map:
 
     def _make_content(self, walls: int, row: int,
                       col: int) -> Gum | SuperGum | None:
+        """
+        Decide what content, if any, a cell should hold.
+
+        Args:
+            walls: Wall bitmask of the cell.
+            row: Row index of the cell.
+            col: Column index of the cell.
+
+        Returns:
+            A SuperGum on the corners, a Gum on normal walkable cells, or
+            None for fully closed cells and the central pattern.
+        """
         if walls == 0b1111 or (row, col) == self.middle:
             return None
         if (row, col) in self._corners:
@@ -80,19 +124,55 @@ class Map:
         return Gum(self._gum_val)
 
     def open_directions(self, position: Vec2) -> list[Direction]:
+        """
+        List the directions an entity can leave a cell by.
+
+        Args:
+            position: The cell to inspect.
+
+        Returns:
+            The cardinal directions that are not blocked by a wall.
+        """
         return [d for d in (Direction.NORTH, Direction.SOUTH,
                             Direction.EAST, Direction.WEST)
                 if self.can_move(position, d)]
 
     def can_move(self, position: Vec2, direction: Direction) -> bool:
+        """
+        Tell whether a move from a cell is allowed.
+
+        Args:
+            position: The cell to move from.
+            direction: The direction to move in.
+
+        Returns:
+            True if no wall blocks the given direction.
+        """
         cell = self.game_map[position.row][position.col]
         return (cell.walls & direction) == 0
 
     def destination(self, position: Vec2, direction: Direction) -> Vec2:
+        """
+        Compute the cell reached by moving one step.
+
+        Args:
+            position: The starting cell.
+            direction: The direction to step in.
+
+        Returns:
+            The coordinates of the adjacent cell in that direction.
+        """
         delta = _DELTA[direction]
         return Vec2(position.row + delta.row, position.col + delta.col)
 
     def delete_content(self, row: int, col: int) -> None:
+        """
+        Remove the gum on a cell and update the remaining count.
+
+        Args:
+            row: Row index of the cell.
+            col: Column index of the cell.
+        """
         if self.game_map[row][col].content is not None:
             self.game_map[row][col].content = None
             self.gums_remaining -= 1

@@ -13,22 +13,49 @@ TEXT_PADDING = 10
 
 
 class ControlsRenderer(PopupRenderer):
+    """
+    Draws the controls popup: the title and each action/key pairing.
+
+    Action labels are drawn in white and the key hints in yellow.
+    """
+
     def __init__(
         self,
         config: dict[str, Any],
         engine: ControlsEngine,
         window_handler: WindowHandler
     ) -> None:
+        """
+        Initialise the popup renderer for the controls screen.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The controls engine providing the key bindings.
+            window_handler: Helper for world-to-screen scaling.
+        """
         super().__init__(config, engine, window_handler)
         self.engine: ControlsEngine = engine
 
     def _centered_x(self, text: str, font_size: int) -> int:
+        """
+        Compute the screen x that horizontally centres text in the popup.
+
+        Args:
+            text: The string to be drawn.
+            font_size: Font size in world units.
+
+        Returns:
+            The screen x coordinate at which to start drawing the text.
+        """
         to_screen = self.window_handler.to_screen
         text_width = pyray.measure_text(text, to_screen(font_size))
         return to_screen(self.popup_x) + \
             (to_screen(POPUP_WIDTH) - text_width) // 2
 
     def render(self) -> None:
+        """
+        Draw the popup panel, the title and the list of controls.
+        """
         super().render()
         to_screen = self.window_handler.to_screen
         n = len(self.engine.controls)
