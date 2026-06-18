@@ -24,12 +24,28 @@ TOGGLE_PAD = 5
 
 
 class RegionPopupRenderer(PopupRenderer):
+    """
+    Draws a popup with a title and a vertical list of selectable regions.
+
+    Highlights the hovered region by inverting its colours and, for regions
+    that report an ON/OFF status, draws a toggle switch on the right. Used
+    for the pause, quit and cheat menus.
+    """
+
     def __init__(
             self,
             config: dict[str, Any],
             engine: RegionPopupEngine,
             window_handler: WindowHandler
     ) -> None:
+        """
+        Initialise the popup renderer for a region-based menu.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The region popup engine providing regions and hover.
+            window_handler: Helper for world-to-screen scaling.
+        """
         super().__init__(config, engine, window_handler)
         self.config = config
         self.engine: RegionPopupEngine = engine
@@ -44,6 +60,18 @@ class RegionPopupRenderer(PopupRenderer):
             on: bool,
             hover_on: bool
     ) -> None:
+        """
+        Draw an ON/OFF toggle switch inside a region box.
+
+        Args:
+            rx: Region box screen x.
+            ry: Region box screen y.
+            rw: Region box screen width.
+            rh: Region box screen height.
+            on: Whether the toggle is in the ON position.
+            hover_on: Whether the region is currently highlighted (drives
+                the inverted colours).
+        """
         to_screen = self.window_handler.to_screen
         sw = to_screen(TOGGLE_WIDTH)
         sh = to_screen(TOGGLE_HEIGHT)
@@ -79,6 +107,9 @@ class RegionPopupRenderer(PopupRenderer):
         pyray.draw_rectangle(tx, ty, tsize, tsize, track)
 
     def render(self) -> None:
+        """
+        Draw the popup panel, the title and each region with its toggle.
+        """
         super().render()
         to_screen = self.window_handler.to_screen
 

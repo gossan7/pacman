@@ -17,17 +17,35 @@ OUTER_LINE_SIZE = 5
 
 
 class MenuRenderer(Renderer):
+    """
+    Draws the main menu: the title and the selectable menu entries.
+
+    The entry matching the engine's hover index is highlighted by
+    inverting its colours.
+    """
+
     def __init__(
             self,
             config: dict[str, Any],
             engine: MenuEngine,
             window_handler: WindowHandler
     ) -> None:
+        """
+        Store the config, menu engine and window handler.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The menu engine providing the hover state.
+            window_handler: Helper for world-to-screen scaling.
+        """
         self.config = config
         self.engine: MenuEngine = engine
         self.window_handler = window_handler
 
     def render(self) -> None:
+        """
+        Draw the title and one box per menu entry, highlighting the hover.
+        """
         to_screen = self.window_handler.to_screen
         pyray.clear_background(pyray.BLACK)
 

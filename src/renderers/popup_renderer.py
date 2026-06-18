@@ -13,12 +13,28 @@ OUTER_LINE_SIZE = 5
 
 
 class PopupRenderer(Renderer):
+    """
+    Base renderer that draws a centred popup panel.
+
+    Dims the screen behind the first popup and draws the bordered panel;
+    subclasses call ``super().render()`` and then draw their contents on
+    top.
+    """
+
     def __init__(
             self,
             config: dict[str, Any],
             engine: PopupEngine,
             window_handler: WindowHandler
     ) -> None:
+        """
+        Store the dependencies and compute the centred panel origin.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The popup engine being drawn.
+            window_handler: Helper for world-to-screen scaling.
+        """
         self.config = config
         self.engine: PopupEngine = engine
         self.window_handler = window_handler
@@ -26,6 +42,9 @@ class PopupRenderer(Renderer):
         self.popup_y = (WORLD_HEIGHT - POPUP_HEIGHT) // 2
 
     def render(self) -> None:
+        """
+        Draw the dim overlay (for the first popup) and the bordered panel.
+        """
         to_screen = self.window_handler.to_screen
 
         if self.engine.popup == 1:

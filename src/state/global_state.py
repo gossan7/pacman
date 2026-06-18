@@ -3,9 +3,23 @@ from .events_enum import EventsEnum
 
 
 class GlobalState:
+    """
+    Mutable state shared across every engine and renderer.
+
+    Holds the data that engines read and write each frame: input events,
+    timing, the focus/engine stack, the current score and the cheat toggles.
+    """
+
     def __init__(
         self, scores: list[tuple[str, int]] | None = None
     ) -> None:
+        """
+        Initialise the shared state.
+
+        Args:
+            scores: Existing highscore entries as (name, score) tuples, or
+                None to start with an empty list.
+        """
         self.focus: EngineFlag = EngineFlag.MENU
         self.scores: list[tuple[str, int]] = scores if scores is not None \
             else []

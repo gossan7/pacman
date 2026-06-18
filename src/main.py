@@ -6,6 +6,13 @@ from .parsers import ScoreParser, ConfigParser
 
 
 def init_window():
+    """
+    Create and configure the game window.
+
+    Opens the raylib window, hides the cursor, scales it to a fraction of
+    the monitor size and disables the default exit key so escape can be
+    handled by the engines.
+    """
     pyray.set_trace_log_level(pyray.TraceLogLevel.LOG_ERROR)
     pyray.init_window(1920, 1080, "Pacman")
     pyray.hide_cursor()
@@ -16,6 +23,12 @@ def init_window():
 
 
 def main() -> None:
+    """
+    Entry point: load config and scores, then run the game.
+
+    Parses the configuration and highscore files, initialises the window
+    and hands control to the orchestrator's main loop.
+    """
     scoreparser = ScoreParser()
     configparser = ConfigParser()
     config: dict[str, Any] = configparser.parse("config")

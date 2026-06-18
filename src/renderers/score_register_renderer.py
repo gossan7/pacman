@@ -15,22 +15,50 @@ PADDING = 14
 
 
 class ScoreRegisterRenderer(PopupRenderer):
+    """
+    Draws the end-of-game name entry popup.
+
+    Shows the win/lose title, the final score, a prompt and the name being
+    typed (with a trailing cursor).
+    """
+
     def __init__(
         self,
         config: dict[str, Any],
         engine: ScoreRegisterEngine,
         window_handler: WindowHandler
     ) -> None:
+        """
+        Initialise the popup renderer for the name entry screen.
+
+        Args:
+            config: Validated configuration dict.
+            engine: The score-register engine providing score and name.
+            window_handler: Helper for world-to-screen scaling.
+        """
         super().__init__(config, engine, window_handler)
         self.engine: ScoreRegisterEngine = engine
 
     def _centered_x(self, text: str, font_size: int) -> int:
+        """
+        Compute the screen x that horizontally centres text in the popup.
+
+        Args:
+            text: The string to be drawn.
+            font_size: Font size in world units.
+
+        Returns:
+            The screen x coordinate at which to start drawing the text.
+        """
         to_screen = self.window_handler.to_screen
         text_width = pyray.measure_text(text, to_screen(font_size))
         return to_screen(self.popup_x) + \
             (to_screen(POPUP_WIDTH) - text_width) // 2
 
     def render(self) -> None:
+        """
+        Draw the popup panel, the title, score, prompt and typed name.
+        """
         super().render()
         to_screen = self.window_handler.to_screen
         title = TITLE_WON if self.engine.won else TITLE_LOST

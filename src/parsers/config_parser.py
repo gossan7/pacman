@@ -37,9 +37,25 @@ _DEFAULT_CONFIG = {
 
 
 class ConfigParser:
+    """
+    Loads and validates the game configuration from a JSON file.
+
+    The parser strips ``#`` comment lines, falls back to sensible defaults
+    for any missing, malformed or out-of-range key, and never raises on bad
+    input so the game can always start.
+    """
 
     @staticmethod
     def _strip_comments(text: str) -> str:
+        """
+        Remove full-line ``#`` comments from raw config text.
+
+        Args:
+            text: The raw file contents.
+
+        Returns:
+            The text with comment-only lines dropped.
+        """
         lines = []
         for line in text.splitlines():
             if line.lstrip().startswith("#"):
@@ -49,6 +65,15 @@ class ConfigParser:
 
     @staticmethod
     def _writable(path: str) -> bool:
+        """
+        Check that a file path can be opened for writing.
+
+        Args:
+            path: The candidate file path.
+
+        Returns:
+            True if the path can be opened in append mode without error.
+        """
         try:
             with open(path, 'a', encoding='utf-8'):
                 pass
@@ -58,6 +83,16 @@ class ConfigParser:
 
     @staticmethod
     def _valid_value(key: str, value: Any) -> bool:
+        """
+        Validate a config value against the rules for its key.
+
+        Args:
+            key: The configuration key being checked.
+            value: The candidate value (already of the expected type).
+
+        Returns:
+            True if the value is within the allowed range for that key.
+        """
         if key == "fps":
             return 30 <= value <= 60
         if key in ("width", "height"):
@@ -74,6 +109,18 @@ class ConfigParser:
         return True
 
     def parse(self, filename: str) -> dict[str, Any]:
+        """
+        Parse a configuration file into a complete config dict.
+
+        Missing or invalid keys are reported with a warning and replaced by
+        their default value; the method never raises on bad input.
+
+        Args:
+            filename: Path to the JSON (with ``#`` comments) config file.
+
+        Returns:
+            A dict with every config key set to a valid value.
+        """
         res: dict[str, Any] = dict(_DEFAULT_CONFIG)
 
         try:

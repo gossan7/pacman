@@ -20,10 +20,28 @@ WASD = {
 
 
 class InputHandler:
+    """
+    Collects keyboard input on a background thread.
+
+    A pynput listener records key presses into a thread-safe buffer; each
+    frame the orchestrator drains that buffer into high-level EventsEnum
+    values. Supports arrow keys and WASD for movement plus enter, escape,
+    F11, space and backspace.
+    """
+
     def __init__(self) -> None:
+        """
+        Set up the listener, input buffer and synchronisation lock.
+        """
         self._lock = Lock()
 
         def on_press(key: Key | KeyCode | None) -> None:
+            """
+            Record a single key press into the shared input buffer.
+
+            Args:
+                key: The key reported by the pynput listener.
+            """
             with self._lock:
                 if isinstance(key, Key):
                     if key in ARROWS:
@@ -66,12 +84,21 @@ class InputHandler:
         self.chars: str = ""
 
     def start(self) -> None:
+        """
+        Start the background keyboard listener.
+        """
         self.listener.start()
 
     def stop(self) -> None:
+        """
+        Stop the background keyboard listener.
+        """
         self.listener.stop()
 
     def _clear_input(self) -> None:
+        """
+        Reset the input buffer to its empty state.
+        """
         self.formatted_inputs["direction"] = None
         self.formatted_inputs["enter"] = False
         self.formatted_inputs["escape"] = False
@@ -80,6 +107,15 @@ class InputHandler:
         self.formatted_inputs["chars"] = ""
 
     def get_formatted_inputs(self) -> list[EventsEnum]:
+        """
+        Drain the buffered key presses into high-level events.
+
+        Also copies the typed characters into ``self.chars`` and clears the
+        buffer so each press is reported only once.
+
+        Returns:
+            The events that occurred since the previous call.
+        """
         to_return = []
         with self._lock:
             if self.formatted_inputs["direction"]:
