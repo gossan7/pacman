@@ -1,14 +1,3 @@
-graph lib: pyray / better mlx
-input: pynput
+readme
 
-config.json
-save.json (score in solo mode, score in coop mode)
-
-polymorphique display with multiple views (menu, game, etc)
-
-main loop qui call les fonctions d'update des views etc:
-    
-exemple de gameplay : https://freepacman.org/
-
-
-limiter la taille minimale à 10x10, en vrai ca marche pas juste avec 2x2 pcq les entitées sont bloquées mais autant bloquer à 10x10 pour que ce soit un peu agréable à jouer
+install (assets)

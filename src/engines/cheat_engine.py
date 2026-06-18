@@ -5,7 +5,7 @@ from ..state import GlobalState
 from ..state import EngineFlag
 
 REGIONS = [
-    "INVICIBILITY",
+    "INVINCIBILITY",
     "GHOST FREEZE",
     "INCREASED SPEED",
     "EXTRA LIFE",
@@ -13,7 +13,7 @@ REGIONS = [
 ]
 
 ACTIONS = {
-    "INVICIBILITY": "invincibility",
+    "INVINCIBILITY": "invincibility",
     "GHOST FREEZE": "ghost_freeze",
     "INCREASED SPEED": "increased_speed",
     "EXTRA LIFE": "extra_life",

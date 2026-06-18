@@ -25,10 +25,12 @@ run: $(INSTALL_STAMP)
 
 package: $(INSTALL_STAMP)
 	$(UV) pyinstaller --onedir --name pac-man \
-		--distpath $(DIST_DIR) \
-		--workpath $(WORK_DIR) \
-		--specpath $(SPEC_DIR) \
-		pac-man.py --noconfirm
+	--add-data "$(CURDIR)/assets:assets" \
+	--add-data "$(CURDIR)/config.json:." \
+	--distpath $(DIST_DIR) \
+	--workpath $(WORK_DIR) \
+	--specpath $(SPEC_DIR) \
+	$(CURDIR)/pac-man.py --noconfirm
 
 debug: $(INSTALL_STAMP)
 	@$(RUN) -m pdb pac-man.py $(ARGS)

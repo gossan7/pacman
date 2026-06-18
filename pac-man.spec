@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['../../pac-man.py'],
+    ['pac-man.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('assets', 'assets'), ('config.json', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
