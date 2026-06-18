@@ -39,7 +39,7 @@ class MenuEngine(Engine):
         self.flag = EngineFlag.MENU
         self.hover_on = 0
 
-    def activate_current_hover(self, globalstate: GlobalState):
+    def activate_current_hover(self, globalstate: GlobalState) -> None:
         """
         Apply the action bound to the highlighted menu entry.
 

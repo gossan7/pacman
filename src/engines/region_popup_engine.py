@@ -56,7 +56,7 @@ class RegionPopupEngine(PopupEngine):
                 case EventsEnum.ESCAPE:
                     globalstate.to_remove = 1
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the highlighted region back to the first one.
         """
