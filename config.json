@@ -10,8 +10,7 @@
 	"level_max_time": 90,
 	"frightened_duration": 7.0,
 	"pacman_speed": 8,
-	#test
 	"ghost_speed": 6,
-	"num_levels": 2,
+	"num_levels": 10,
 	"highscore_filename": "highSCORE.json"
 }

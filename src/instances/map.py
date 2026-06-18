@@ -71,9 +71,11 @@ class Map:
             height: Maze height in cells.
             seed: Seed forwarded to the maze generator for reproducibility.
         """
-
-        self._mazegen: MazeGenerator = MazeGenerator(
-            size=(width, height), perfect=False, seed=seed)
+        try:
+            self._mazegen: MazeGenerator = MazeGenerator(
+                size=(width, height), perfect=False, seed=seed)
+        except Exception as e:
+            raise Exception(f"Error during maze generation: {e}")
 
         self._corners = {(0, 0), (0, width - 1), (height - 1, 0),
                          (height - 1, width - 1)}

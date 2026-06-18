@@ -2,9 +2,26 @@ import os
 import sys
 from typing import Any
 import pyray
+import shutil
 
 from .core import Orchestrator
 from .parsers import ScoreParser, ConfigParser
+
+
+def _ensure_config() -> None:
+    """
+    On a packaged build, drop the bundled default config next to the
+    executable on first launch, so it exists and can be edited. Existing
+    user edits are never overwritten.
+    """
+    if os.path.exists("config.json"):
+        return
+    base = getattr(sys, "_MEIPASS", None)
+    if not isinstance(base, str):
+        return
+    bundled = os.path.join(base, "config.json")
+    if os.path.exists(bundled):
+        shutil.copy(bundled, "config.json")
 
 
 def init_window() -> None:
@@ -41,9 +58,10 @@ def main() -> None:
     if args:
         config_path = args[0]
     elif frozen:
-        config_path = "config"
+        _ensure_config()
+        config_path = "config.json"
     else:
-        print("Usage: python3 pac-man.py <config file>")
+        print("Usage: python3 pac-man.py <config.json>")
         return
     scoreparser = ScoreParser()
     configparser = ConfigParser()
@@ -52,10 +70,3 @@ def main() -> None:
     init_window()
     orchestrator = Orchestrator(config, scores)
     orchestrator.run()
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"An error has occured during the program: {e}")
