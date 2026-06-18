@@ -31,7 +31,7 @@ _DEFAULT_CONFIG = {
     "frightened_duration": 7.0,
     "pacman_speed": 10,
     "ghost_speed": 6,
-    "num_levels": 3,
+    "num_levels": 10,
     "highscore_filename": "highSCORE.json"
 }
 
@@ -95,8 +95,10 @@ class ConfigParser:
         """
         if key == "fps":
             return bool(30 <= value <= 60)
+        if key == "num_levels":
+            return bool(value >= 10)
         if key in ("width", "height"):
-            return bool(200 >= value >= 10)
+            return bool(value >= 10)
         if key in ("lives", "num_levels", "level_max_time",
                    "pacman_speed", "ghost_speed"):
             return bool(value > 0)
