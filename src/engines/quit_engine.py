@@ -1,5 +1,7 @@
 from . import RegionPopupEngine
-from ..state import EngineFlag
+from ..state import EngineFlag, GlobalState
+
+from typing import Any
 
 
 REGIONS = [
@@ -24,7 +26,7 @@ class QuitEngine(RegionPopupEngine):
     on the pending ``to_add_on_quit`` target.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: dict[str, Any]) -> None:
         """
         Initialise the quit confirmation with its regions and title.
 
@@ -36,7 +38,7 @@ class QuitEngine(RegionPopupEngine):
         self.regions = REGIONS
         self.text_to_display = TEXT_TO_DISPLAY
 
-    def activate_current_hover(self, globalstate):
+    def activate_current_hover(self, globalstate: GlobalState) -> None:
         """
         Confirm or cancel the quit based on the highlighted region.
 

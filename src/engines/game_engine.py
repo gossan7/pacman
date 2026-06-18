@@ -78,14 +78,14 @@ class GameEngine(Engine):
         Resets lives, score, timers and flags, then reloads the first level
         from the configured seed.
         """
-        self.intro_remaining: float = 0.0
-        self.outro_remaining: float = 0.0
-        self.death_remaining: float = 0.0
-        self.lives: int = self.config["lives"]
-        self.score: int = 0
-        self.level: int = 1
-        self.game_ended: bool = False
-        self.won: bool = False
+        self.intro_remaining = 0.0
+        self.outro_remaining = 0.0
+        self.death_remaining = 0.0
+        self.lives = self.config["lives"]
+        self.score = 0
+        self.level = 1
+        self.game_ended = False
+        self.won = False
         self._load_level(self.config["seed"])
 
     def _load_level(self, seed: int) -> None:

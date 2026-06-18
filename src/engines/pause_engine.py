@@ -3,6 +3,7 @@ from collections import deque
 from .region_popup_engine import RegionPopupEngine
 from ..state import EngineFlag, GlobalState, EventsEnum
 
+from typing import Any
 
 REGIONS = [
     "RESUME",
@@ -39,7 +40,7 @@ class PauseEngine(RegionPopupEngine):
     direction keys to open the cheat menu.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialise the pause menu and the Konami input buffer.
 
@@ -50,7 +51,7 @@ class PauseEngine(RegionPopupEngine):
         self.flag = EngineFlag.PAUSE
         self.regions = REGIONS
         self.text_to_display = TEXT_TO_DISPLAY
-        self.current_input_seq = deque()
+        self.current_input_seq: deque = deque()
 
     def activate_current_hover(self, globalstate: GlobalState) -> None:
         """
@@ -66,7 +67,7 @@ class PauseEngine(RegionPopupEngine):
         if to_add:
             globalstate.to_add = to_add
 
-    def handle_konami(self, event: EventsEnum):
+    def handle_konami(self, event: EventsEnum) -> bool:
         """
         Feed a direction event to the Konami code detector.
 

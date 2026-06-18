@@ -54,7 +54,7 @@ class WindowHandler:
         """
         return int(n * self.ratio)
 
-    def to_ratio(self, n: int) -> float:
+    def to_ratio(self, n: int | float) -> float:
         """
         Scale a world-space length to screen pixels without rounding.
 

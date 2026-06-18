@@ -8,14 +8,23 @@ from ..engines import GameEngine
 from .window_handler import WindowHandler, WORLD_WIDTH, WORLD_HEIGHT
 from ..instances import Direction, SuperGum, Ghost
 from ..state import GhostKind, GhostMode
+import os
+import sys
+
+
+def _asset(rel: str) -> str:
+    base = getattr(sys, "_MEIPASS", None)
+    if isinstance(base, str):
+        return os.path.join(base, rel)
+    return rel
 
 
 HUD_HEIGHT = 90
 MARGIN = 20
 HUD_FONT = 36
 
-PACMAN_SHEET = str("assets/pacman.png")
-GHOSTS_SHEET = str("assets/ghosts.png")
+PACMAN_SHEET = _asset("assets/pacman.png")
+GHOSTS_SHEET = _asset("assets/ghosts.png")
 
 WALL_COLOR = pyray.Color(33, 33, 222, 255)
 GUM_COLOR = pyray.Color(255, 220, 180, 255)
@@ -110,7 +119,8 @@ class GameRenderer(Renderer):
         pyray.image_color_replace(img, pyray.BLACK, pyray.BLANK)
         tex = pyray.load_texture_from_image(img)
         pyray.unload_image(img)
-        pyray.set_texture_filter(tex, pyray.TEXTURE_FILTER_POINT)
+        pyray.set_texture_filter(
+            tex, pyray.TextureFilter.TEXTURE_FILTER_POINT)
         return tex
 
     def unload(self) -> None:
@@ -235,7 +245,7 @@ class GameRenderer(Renderer):
         pyray.end_texture_mode()
 
     def _create_vertex(self, vr: int, vc: int, cell: int,
-                       ox: int, oy: int, sr: int, st: int) -> None:
+                       ox: int, oy: int, sr: float, st: float) -> None:
         """
         Draw the rounded corner arc at a single maze vertex.
 

@@ -132,14 +132,14 @@ class Orchestrator:
         elapsed = perf_counter() - self.frame_start
         sleep(max(0, self.frame_time - elapsed))
 
-    def loop_start(self):
+    def loop_start(self) -> None:
         """
         Begin a frame: open drawing and clear the background.
         """
         pyray.begin_drawing()
         pyray.clear_background(pyray.BLACK)
 
-    def loop_end(self):
+    def loop_end(self) -> None:
         """
         End a frame by flushing the draw calls to the window.
         """

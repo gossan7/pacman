@@ -1,3 +1,5 @@
+import os
+import sys
 from typing import Any
 import pyray
 
@@ -5,7 +7,7 @@ from .core import Orchestrator
 from .parsers import ScoreParser, ConfigParser
 
 
-def init_window():
+def init_window() -> None:
     """
     Create and configure the game window.
 
@@ -29,9 +31,23 @@ def main() -> None:
     Parses the configuration and highscore files, initialises the window
     and hands control to the orchestrator's main loop.
     """
+    frozen = getattr(sys, "frozen", False)
+    if frozen:
+        os.chdir(os.path.dirname(sys.executable))
+    args = sys.argv[1:]
+    if len(args) > 1:
+        print("Error: too many arguments. Expected a single config file.")
+        return
+    if args:
+        config_path = args[0]
+    elif frozen:
+        config_path = "config"
+    else:
+        print("Usage: python3 pac-man.py <config file>")
+        return
     scoreparser = ScoreParser()
     configparser = ConfigParser()
-    config: dict[str, Any] = configparser.parse("config")
+    config: dict[str, Any] = configparser.parse(config_path)
     scores = scoreparser.parse(config["highscore_filename"])
     init_window()
     orchestrator = Orchestrator(config, scores)

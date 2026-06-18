@@ -31,7 +31,7 @@ class PopupEngine(Engine):
         """
         self.popup = globalstate.popup
 
-    def update_always(self, globalstate):
+    def update_always(self, globalstate: GlobalState) -> None:
         """
         Run every frame; popups have no always-on logic by default.
 
