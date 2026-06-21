@@ -16,8 +16,7 @@ followed by a cleaner version.
 
 **05/06** - `RegionPopupEngine` (the base for the overlay menus).
 
-**08/06** - Pop-up region + quit engine, added the frightened ("fatigue")
-mode.
+**08/06** - Pop-up region + quit engine.
 
 **09/06** - Scores engine, controls engine, and catching the escape key so it
 can be handled by the engines.
@@ -31,3 +30,5 @@ spaces.
 
 **17/06** - Reworked the cheat-renderer toggle and added the Konami code,
 wrote the docstrings and a first README draft.
+
+**21/06** - Finished the README.md
