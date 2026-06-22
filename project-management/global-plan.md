@@ -44,10 +44,10 @@ for the trickiest), fixed on a branch, reviewed, then merged.
 
 | Week | Dates | Focus |
 |---|---|---|
-| W0 | 29/05 – 31/05 | Base structure, repo setup (Victor) |
-| W1 | 01/06 – 07/06 | Scaffolding: instances, engines, input, first GameEngine, ghosts, first playable, menu engine, window handler, renderer base |
-| W2 | 08/06 – 14/06 | Collisions/hitbox, sprites, rounded maze, animations, end-of-game, pop-ups, scores/controls engines, pause, fullscreen |
-| W3 | 15/06 – 18/06 | Parsers, GameEngine reset, cheats + Konami, score register, lint/type pass, docs, itch.io packaging |
+| W0 | 29/05 - 31/05 | Base structure, repo setup (Victor) |
+| W1 | 01/06 - 07/06 | Scaffolding: instances, engines, input, first GameEngine, ghosts, first playable, menu engine, window handler, renderer base |
+| W2 | 08/06 - 14/06 | Collisions/hitbox, sprites, rounded maze, animations, end-of-game, pop-ups, scores/controls engines, pause, fullscreen |
+| W3 | 15/06 - 18/06 | Parsers, GameEngine reset, cheats + Konami, score register, lint/type pass, docs, itch.io packaging |
 
 ```mermaid
 gantt
@@ -76,7 +76,7 @@ gantt
 Core gameplay landed on time
 (first playable ~07/06), parser hardening and the once-per-level end-of-game
 fix slipped to W3, quality and packaging were concentrated at the very end
-(17–18/06). 
+(17-18/06). 
 
 ## Key choices
 

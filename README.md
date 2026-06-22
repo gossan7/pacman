@@ -1,6 +1,6 @@
 *This project has been created as part of the 42 curriculum by vquetier, mdourdoi.*
 
-# Pacman — Ghosts! More ghosts!
+# Pacman - Ghosts! More ghosts!
 
 ## Description
 
@@ -22,6 +22,8 @@ Highlights:
 
 The game loop follows: **Main Menu → Start Game → Win or Lose → Enter name for
 highscore → Back to Main Menu.**
+
+The game is available on itch.io on private: https://mdourdoi.itch.io/42-pacman
 
 ## Instructions
 
@@ -99,7 +101,7 @@ default; **unknown keys are ignored**.
 | `pacman_speed`        | int   | `10`               | > 0                        |
 | `ghost_speed`         | int   | `6`                | > 0                        |
 | `num_levels`          | int   | `1`                | > 0                        |
-| `highscore_filename`  | str   | `highSCORE.json`   | a writable path            |
+| `highscore_filename`  | str   | `highscore.json`   | a writable path            |
 
 Example:
 
@@ -119,14 +121,14 @@ Example:
     # comments starting with '#' are ignored
     "ghost_speed": 6,
     "num_levels": 2,
-    "highscore_filename": "highSCORE.json"
+    "highscore_filename": "highscore.json"
 }
 ```
 
 ## Highscore
 
 Highscores are stored as a **JSON file** on disk (path set by
-`highscore_filename`, default `highSCORE.json`). The file is a list of
+`highscore_filename`, default `highscore.json`). The file is a list of
 `{"name": ..., "score": ...}` objects.
 
 How it works:
@@ -179,7 +181,7 @@ Key points:
   cheats, scores, controls, quit, score registration) is an `Engine` (logic)
   paired with a `Renderer` (drawing). Screens are kept on a **stack** in the
   shared `GlobalState`; the top of the stack has focus. This makes overlays like
-  the pause and cheat popups natural — they are pushed on top of the game.
+  the pause and cheat popups natural - they are pushed on top of the game.
 - **Input.** Keyboard input is read on a background thread via `pynput` and
   translated into abstract events (`EventsEnum`), so engines never deal with raw
   keys.
@@ -265,7 +267,7 @@ Relationships at a glance:
 
 Classic references on the topic and the tools used:
 
-- **The Pac-Man Dossier** — Jamey Pittman's reference on the original ghost AI
+- **The Pac-Man Dossier** - Jamey Pittman's reference on the original ghost AI
   and targeting rules: <https://www.gamedeveloper.com/design/the-pac-man-dossier>
 - **Pac-Man** (Wikipedia) for history and rules:
   <https://en.wikipedia.org/wiki/Pac-Man>
@@ -297,4 +299,6 @@ dedicated directory: **[`project-management/`](./project-management/)**.
 
 We worked iteratively with a feature-branch + pull-request workflow on GitHub,
 splitting the work across the engine/renderer layers and integrating through
-reviewed merges.
+reviewed merges. We splitted the work in-person after implementing all the
+classes together, since every engine is independant we did not rely on each
+other's work to validate.

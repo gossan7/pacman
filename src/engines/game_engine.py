@@ -15,6 +15,7 @@ EVENT_TO_DIRECTION: dict[EventsEnum, Direction] = {
     EventsEnum.RIGHT: Direction.EAST
 }
 
+_BASE_FPS = 60
 _STEP_COST = 100
 _EAT_AT = 7 * _STEP_COST // 10
 _FREEZE_TIME = 1.5
@@ -755,9 +756,10 @@ class GameEngine(Engine):
         self._tick_level_timer(globalstate.delta_time)
         self._tick_ghost_states(globalstate.delta_time)
 
+        dt_factor = globalstate.delta_time * _BASE_FPS
         # PACMAN
-        self.pacman_progress += self.pacman_speed * \
-            (1 if not globalstate.cheats_state["increased_speed"] else 1.5)
+        cheat = 1.5 if globalstate.cheats_state["increased_speed"] else 1.0
+        self.pacman_progress += self.pacman_speed * dt_factor * cheat
         while self.pacman_progress >= _STEP_COST and not self.game_ended:
             if self._step_pacman():
                 self.pacman_progress -= _STEP_COST
@@ -767,7 +769,7 @@ class GameEngine(Engine):
 
         # GHOSTS
         if not globalstate.cheats_state["ghost_freeze"]:
-            self.ghost_progress += self._current_ghost_speed()
+            self.ghost_progress += self._current_ghost_speed() * dt_factor
             while self.ghost_progress >= _STEP_COST and not self.game_ended:
                 self.ghost_progress -= _STEP_COST
                 self._step_ghosts()

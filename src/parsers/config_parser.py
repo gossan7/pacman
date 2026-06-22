@@ -32,7 +32,7 @@ _DEFAULT_CONFIG = {
     "pacman_speed": 10,
     "ghost_speed": 6,
     "num_levels": 10,
-    "highscore_filename": "highSCORE.json"
+    "highscore_filename": "highscore.json"
 }
 
 
