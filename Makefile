@@ -48,6 +48,6 @@ clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 fclean: clean
-	@rm -rf .venv
+	@rm -rf .venv build
 
 .PHONY: all install run package debug lint clean fclean

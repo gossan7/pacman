@@ -65,13 +65,13 @@ Other Makefile targets:
 
 ### Controls
 
-| Action          | Keys                                  |
-| --------------- | ------------------------------------- |
-| Move            | Arrow keys **or** `W` `A` `S` `D`     |
-| Select / Confirm| `Enter`                               |
-| Pause / Back    | `Esc`                                 |
-| Type name       | Alphanumeric keys + `Space`, `Backspace` to delete |
-| Toggle fullscreen | `F11`                               |
+| Action            | Keys                                               |
+| ----------------- | -------------------------------------------------- |
+| Move              | Arrow keys **or** `W` `A` `S` `D`                  |
+| Select / Confirm  | `Enter`                                            |
+| Pause / Back      | `Esc`                                              |
+| Type name         | Alphanumeric keys + `Space`, `Backspace` to delete |
+| Toggle fullscreen | `F11`                                              |
 
 In the pause menu, entering the **Konami code**
 (`↑ ↑ ↓ ↓ ← → ← →`) opens the cheat menu.
@@ -90,8 +90,8 @@ default; **unknown keys are ignored**.
 | --------------------- | ----- | ------------------ | -------------------------- |
 | `fps`                 | int   | `60`               | 30–60                      |
 | `seed`                | int   | `42`               | any int (level 1 seed)     |
-| `width`               | int   | `10`               | 10–200                     |
-| `height`              | int   | `10`               | 10–200                     |
+| `width`               | int   | `10`               | >= 10                      |
+| `height`              | int   | `10`               | >= 10                      |
 | `lives`               | int   | `3`                | > 0                        |
 | `gum_val`             | int   | `10`               | ≥ 0 (points per pacgum)    |
 | `supergum_val`        | int   | `50`               | ≥ 0 (points per super-pacgum) |
@@ -100,7 +100,7 @@ default; **unknown keys are ignored**.
 | `frightened_duration` | float | `7.0`              | > 0 (seconds ghosts stay edible) |
 | `pacman_speed`        | int   | `10`               | > 0                        |
 | `ghost_speed`         | int   | `6`                | > 0                        |
-| `num_levels`          | int   | `1`                | > 0                        |
+| `num_levels`          | int   | `1`                | >= 10                      |
 | `highscore_filename`  | str   | `highscore.json`   | a writable path            |
 
 Example:
@@ -120,7 +120,7 @@ Example:
     "pacman_speed": 8,
     # comments starting with '#' are ignored
     "ghost_speed": 6,
-    "num_levels": 2,
+    "num_levels": 10,
     "highscore_filename": "highscore.json"
 }
 ```
@@ -286,10 +286,6 @@ review tasks**, not to generate the core game design or logic:
 - Writing and refining the **PEP 257 docstrings** across the codebase.
 - Drafting this **README** from the subject requirements and the existing code.
 - Easy functions (ie. visual padding for popups)
-
-All AI-assisted output was read, understood and validated by the authors, who
-remain responsible for the project. The game architecture, gameplay and ghost AI
-were designed and implemented by the team.
 
 ## Project Management
 
