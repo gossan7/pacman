@@ -63,6 +63,6 @@ crashes on a bad config file.
 
 SCORES
 ------
-High scores are saved in "highSCORE.json" (or the name set in config.json),
+High scores are saved in "highscore.json" (or the name set in config.json),
 next to the executable. Names are limited to 10 characters (letters, digits
 and spaces).

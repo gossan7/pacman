@@ -32,7 +32,7 @@ package: $(INSTALL_STAMP)
 	--specpath $(SPEC_DIR) \
 	$(CURDIR)/pac-man.py --noconfirm
 	@cp $(CURDIR)/.itch.toml $(CURDIR)/INSTRUCTIONS.txt $(DIST_DIR)/pac-man/
-	@cp $(CURDIR)/config.json $(CURDIR)/highSCORE.json $(DIST_DIR)/pac-man/
+	@cp $(CURDIR)/config.json $(CURDIR)/highscore.json $(DIST_DIR)/pac-man/
 	@cd $(DIST_DIR)/pac-man && rm -f ../pac-man.zip && zip -qr ../pac-man.zip .
 
 debug: $(INSTALL_STAMP)

@@ -54,7 +54,7 @@
  [],
  False,
  False,
- 1782124788,
+ 1782125863,
  [('run',
    '/home/mdourdoi/Documents/pacman/.venv/lib/python3.13/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run',
    'EXECUTABLE')],

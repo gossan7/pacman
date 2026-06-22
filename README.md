@@ -101,7 +101,7 @@ default; **unknown keys are ignored**.
 | `pacman_speed`        | int   | `10`               | > 0                        |
 | `ghost_speed`         | int   | `6`                | > 0                        |
 | `num_levels`          | int   | `1`                | > 0                        |
-| `highscore_filename`  | str   | `highSCORE.json`   | a writable path            |
+| `highscore_filename`  | str   | `highscore.json`   | a writable path            |
 
 Example:
 
@@ -121,14 +121,14 @@ Example:
     # comments starting with '#' are ignored
     "ghost_speed": 6,
     "num_levels": 2,
-    "highscore_filename": "highSCORE.json"
+    "highscore_filename": "highscore.json"
 }
 ```
 
 ## Highscore
 
 Highscores are stored as a **JSON file** on disk (path set by
-`highscore_filename`, default `highSCORE.json`). The file is a list of
+`highscore_filename`, default `highscore.json`). The file is a list of
 `{"name": ..., "score": ...}` objects.
 
 How it works:
