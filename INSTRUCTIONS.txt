@@ -1,0 +1,68 @@
+PAC-MAN
+=======
+
+LAUNCH
+------
+Run the "pac-man" executable (double-click it, or ./pac-man from a terminal).
+From the itch app: click Install, then Launch.
+
+
+CONTROLS
+--------
+Move ................. Arrow keys or WASD
+Select / confirm ..... Enter
+Pause / back ......... Escape
+Fullscreen ........... F11
+
+Entering your name on the high-score screen:
+  Type ............... letters, digits and space
+  Erase .............. Backspace
+  Confirm ............ Enter
+
+
+MENUS
+-----
+Main menu (navigate with the arrows, select with Enter):
+  PLAY      start a new game
+  SCORES    view the high scores
+  CONTROLS  show the controls
+  QUIT      leave the game
+
+In-game pause (press Escape):
+  RESUME    back to the game
+  CONTROLS  show the controls
+  QUIT      back to the main menu
+
+Cheats: a secret input sequence (Konami-style) unlocks cheats.
+
+
+CONFIGURATION
+-------------
+The game reads "config.json", located next to the executable. It is created
+automatically on the first launch; open it in any text editor to tweak the
+game. Available settings:
+
+  fps                  frame rate (30-60)
+  seed                 maze generation seed
+  width                maze dimensions, in cells (min 10)
+  height               maze height, in cells (min 10)
+  lives                number of starting lives
+  gum_val              points per gum
+  supergum_val         points per super gum
+  ghost_val            points per ghost eaten
+  level_max_time       time limit per level, in seconds
+  frightened_duration  how long ghosts stay edible, in seconds
+  pacman_speed         Pac-Man speed
+  ghost_speed          ghost speed
+  num_levels           number of levels
+  highscore_filename   name of the high-score file
+
+Invalid, missing or unknown values fall back to safe defaults: the game never
+crashes on a bad config file.
+
+
+SCORES
+------
+High scores are saved in "highSCORE.json" (or the name set in config.json),
+next to the executable. Names are limited to 10 characters (letters, digits
+and spaces).

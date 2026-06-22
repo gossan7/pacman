@@ -31,6 +31,9 @@ package: $(INSTALL_STAMP)
 	--workpath $(WORK_DIR) \
 	--specpath $(SPEC_DIR) \
 	$(CURDIR)/pac-man.py --noconfirm
+	@cp $(CURDIR)/.itch.toml $(CURDIR)/INSTRUCTIONS.txt $(DIST_DIR)/pac-man/
+	@cp $(CURDIR)/config.json $(CURDIR)/highSCORE.json $(DIST_DIR)/pac-man/
+	@cd $(DIST_DIR)/pac-man && rm -f ../pac-man.zip && zip -qr ../pac-man.zip .
 
 debug: $(INSTALL_STAMP)
 	@$(RUN) -m pdb pac-man.py $(ARGS)
@@ -45,6 +48,6 @@ clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 fclean: clean
-	@rm -rf .venv build
+	@rm -rf .venv
 
 .PHONY: all install run package debug lint clean fclean

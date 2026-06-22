@@ -23,6 +23,8 @@ Highlights:
 The game loop follows: **Main Menu → Start Game → Win or Lose → Enter name for
 highscore → Back to Main Menu.**
 
+The game is available on itch.io on private: https://mdourdoi.itch.io/42-pacman
+
 ## Instructions
 
 ### Requirements
@@ -297,4 +299,6 @@ dedicated directory: **[`project-management/`](./project-management/)**.
 
 We worked iteratively with a feature-branch + pull-request workflow on GitHub,
 splitting the work across the engine/renderer layers and integrating through
-reviewed merges.
+reviewed merges. We splitted the work in-person after implementing all the
+classes together, since every engine is independant we did not rely on each
+other's work to validate.
