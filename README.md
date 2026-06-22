@@ -1,6 +1,6 @@
 *This project has been created as part of the 42 curriculum by vquetier, mdourdoi.*
 
-# Pacman — Ghosts! More ghosts!
+# Pacman - Ghosts! More ghosts!
 
 ## Description
 
@@ -179,7 +179,7 @@ Key points:
   cheats, scores, controls, quit, score registration) is an `Engine` (logic)
   paired with a `Renderer` (drawing). Screens are kept on a **stack** in the
   shared `GlobalState`; the top of the stack has focus. This makes overlays like
-  the pause and cheat popups natural — they are pushed on top of the game.
+  the pause and cheat popups natural - they are pushed on top of the game.
 - **Input.** Keyboard input is read on a background thread via `pynput` and
   translated into abstract events (`EventsEnum`), so engines never deal with raw
   keys.
@@ -265,7 +265,7 @@ Relationships at a glance:
 
 Classic references on the topic and the tools used:
 
-- **The Pac-Man Dossier** — Jamey Pittman's reference on the original ghost AI
+- **The Pac-Man Dossier** - Jamey Pittman's reference on the original ghost AI
   and targeting rules: <https://www.gamedeveloper.com/design/the-pac-man-dossier>
 - **Pac-Man** (Wikipedia) for history and rules:
   <https://en.wikipedia.org/wiki/Pac-Man>
